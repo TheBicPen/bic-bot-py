@@ -1,18 +1,34 @@
-def hello(message):
-    return 'Hello {0.author.mention}'.format(message)
+#no params, simple text
+def isbot(message):
+    return "yes"
 
 def ping(message):
     return "pong!"
 
-def isbot(message):
-    return "yes"
+#no params, other
+def version():
+    return "uh python doesn't really do that"
 
-def commit(message):
-    
+#params: message only
+def hello(message):
+    return 'Hello {0.author.mention}'.format(message)
 
-def version(message):
+#params: command text only
+def commit(commit_list:list):
+    import random
+    return commit_list[random.randrange(len(commit_list))]
 
+#params: message and command text
+def extrathicc(message, thicc_dict:dict):
+    out = ""
+    index = message.content.find("extrathicc") + len("extrathicc")
+    for ch in message.content.upper()[index:]: #dict contains uppercase letters
+        out += thicc_dict.get(ch, "")
+    return out
+#params: message and user data
 def callme(message):
+    pass
 
 def myname(message):
+    pass
     get_name(message.author)
