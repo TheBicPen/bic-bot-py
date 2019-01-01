@@ -1,13 +1,14 @@
 # Work with Python 3.6
 import discord
 
-def on_get_token(file:str) -> str:
-    token = read(open(file))
-    close(file)
+def get_token(file:str) -> str:
+    file_IO = open(file, "r")
+    token = file_IO.read().strip("\n")
+    file_IO.close()
     return token
 
 
-TOKEN = 
+TOKEN = get_token("token.txt")
 
 client = discord.Client()
 
