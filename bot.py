@@ -1,7 +1,13 @@
 # Work with Python 3.6
 import discord
 
-TOKEN = 'XXXXXXXXXX'
+def on_get_token(file:str) -> str:
+    token = read(open(file))
+    close(file)
+    return token
+
+
+TOKEN = 
 
 client = discord.Client()
 
