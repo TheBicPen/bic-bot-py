@@ -1,20 +1,29 @@
 # Work with Python 3.6
 import discord
 import commands
+import os
+
+
+def make_directory(dir):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
 
 def read_file(file:str) -> list:
     """
     Returns the contents of the file. If the file does not exist, creates the file
     and returns an empty list.
+    #precondition: the directory exists
     """
     try:
         file_IO = open(file, "r")
         contents = file_IO.read().splitlines()
-        file_IO.close()
     except:
-        file_IO = open(file, "w")
-        file_IO.close()
+        dir = os.path.split(file)[0]
+        make_directory(dir)
+        file_IO = open(file, "x")
         contents = []
+    finally:
+        file_IO.close()
     return contents
 
 def read_dict_from_file(d:dict, file:str):
