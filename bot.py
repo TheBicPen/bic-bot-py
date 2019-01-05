@@ -52,8 +52,8 @@ def write_dict_to_file(d:dict, file:str):
 def parse_message(message):
     out = ""
     msg = message.content
-    if msg.startswith(command_str): 
-        msg = msg[len(command_str):] #strip the command string
+    if msg.startswith(settings["command_str"]): 
+        msg = msg[len(settings["command_str"]):] #strip the command string
         msg_list = msg.split()
         if len(msg_list) > 0: #check for empty command string
             skip_send = False
@@ -67,6 +67,8 @@ def parse_message(message):
             #no params, other
             elif msg_list[0] == "version":
                 out = commands.version()
+            elif msg_list[0] == "settings":
+                out = commands.settings(settings) #redundant, but consistent
             #params: message only
             elif msg_list[0] == "hello":
                 out = commands.hello(message)
@@ -80,8 +82,9 @@ def parse_message(message):
                 out = commands.extrathicc(message, thicc_dict)
             #params: message and user data
             elif msg_list[0] == "callme":
-                user_to_callme = read_file("user data/callme.txt")
-                out = commands.callme(message, user_to_callme)
+                user_to_nickname = {}
+                read_dict_from_file(user_to_nickname, "user data/callme.txt")
+                out = commands.callme(message, user_to_nickname)
             elif msg_list[0] == "myname":
                 out = commands.myname(message)
             else:
@@ -98,7 +101,7 @@ TOKEN = read_file("token.txt")[0]
 read_dict_from_file(settings, "settings.txt")
 client = discord.Client()
 
-command_str = settings["command_str"]
+#command_str = settings["command_str"]
 
 #TOKEN = None
 #settings = None
@@ -112,12 +115,25 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith("!debug"):
-        msg = 'Hello {0.author.mention}'.format(message)
-        await client.send_message(message.channel, msg)
+    if message.content.startswith("!debug1"):
+        msg = 'Hello {0.author.mention}. The command string is {1}'.format(message, settings["command_str"])
+    elif message.content.startswith("!eval"):
+        if message.author == message.server.owner:
+             #evalutate the message only if the message author is the owner
+            msg = eval(commands.strip2(message.content, "!eval"))
+        else:
+            msg = "Insufficient permissions. Must be server owner."
+    elif message.content.startswith("!exec"):
+        if message.author == message.server.owner:
+             #evalutate the message only if the message author is the owner
+            msg = exec(commands.strip2(message.content, "!exec"))
+            return #exec doesn't return anything, so we return to not send an empty message
+        else:
+            msg = "Insufficient permissions. Must be server owner."
+    else:
+        msg = parse_message(message)
 
-    msg = parse_message(message)
-    if len(msg) > 0:
+    if type(msg) != str or len(msg) > 0:
         await client.send_message(message.channel, msg)
 
 @client.event
