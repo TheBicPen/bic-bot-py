@@ -69,14 +69,17 @@ def parse_message(message):
                 thicc_dict = {}
                 read_dict_from_file(thicc_dict, "dictionary text/extra thicc.txt")
                 out = commands.extrathicc(message, thicc_dict)
+	    elif msg_list[0] == "keeb":
+		out = commands.keeb(message, read_file("dictionary text/korean.txt"))
             #params: message and user data
             elif msg_list[0] == "callme":
                 user_to_callme = read_file("user data/callme.txt")
-                out = commands.callme(message, user_to_callme)
+                out = commands.callme(message, user_to_nickname)
             elif msg_list[0] == "myname":
                 out = commands.myname(message)
             else:
                 out = "invalid command"
+				
     return out
 
 #initialize

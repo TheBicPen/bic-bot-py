@@ -17,6 +17,12 @@ def hello(message):
 def commit(commit_list:list):
     import random
     return commit_list[random.randrange(len(commit_list))]
+	
+def keeb(message, korean_list: list):
+	for letter in message.content:
+		if letter in korean_list:
+			return True
+	return False
 
 #params: message and command text
 def extrathicc(message, thicc_dict:dict):
@@ -26,7 +32,7 @@ def extrathicc(message, thicc_dict:dict):
         out += thicc_dict.get(ch, "")
     return out
 #params: message and user data
-def callme(message):
+def callme(message, user_to_nickname):
     pass
 
 def myname(message):
