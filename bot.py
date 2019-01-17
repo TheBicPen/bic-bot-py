@@ -9,10 +9,13 @@ import commands
 
 TOKEN = commands.read_file("token.txt")[0]
 
-settings = {
-        "command_str": "bb "
+default_settings = {
+        "command_str": "bb ",
+        "annoyed_everyone": True,
+        "everyone_string": "no u"
         }
-settings = commands.read_dict_from_file("settings.txt", settings)
+settings = commands.read_dict_from_file("settings.txt", default_settings)
+commands.settings = settings
 client = discord.Client()
 
 #command_str = settings["command_str"]
@@ -33,16 +36,18 @@ async def on_message(message):
         msg = 'Hello {0.author.mention}. The command string is {1}'.format(message, settings["command_str"])
 
     else:
-        msg = commands.parse_message(message, settings)
+        msg = commands.parse_message(message)
 
-    try:
-        msg_len = getattr(msg,"__len__")
-        if msg_len == 0:
-            return
-    except:
-        pass
-    finally:
-        await client.send_message(message.channel, msg)
+    if not msg is None:
+        try:
+            msg_len = getattr(msg,"__len__")
+            if msg_len == 0:
+                return
+        except:
+            pass
+        finally:
+            print("msg: {0}\n".format(msg))
+            await client.send_message(message.channel, msg)
 
 @client.event
 async def on_ready():
