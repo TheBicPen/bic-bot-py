@@ -81,7 +81,7 @@ def parse_message(message):
                 read_dict_from_file(thicc_dict, "dictionary text/extra thicc.txt")
                 out = commands.extrathicc(message, thicc_dict)
 	        elif msg_list[0] == "keeb":
-		        out = commands.keeb(message, read_file("dictionary text/korean.txt"))
+	            out = commands.keeb(message, read_file("dictionary text/korean.txt"))
             #params: message and user data
             elif msg_list[0] == "callme":
                 user_to_nickname = {}
