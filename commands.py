@@ -60,11 +60,10 @@ def extrathicc(message, thicc_dict:dict):
     return out
 #params: message and user data
 
-def callme(message, user_to_nickname: dict): #not to be confused with discord nickname
+def callme(message, user_to_property: dict): #not to be confused with discord nickname
     nickname = strip2(message.content, "callme") #command_text must be separate from the command by a space
-    user_to_nickname.update({message.author: nickname})
+    user_to_property.update({"nickname": nickname})
     return "{0}, I will call you {1}".format(message.author.mention, nickname)
 
-def myname(message): 
-    pass
-    get_name(message.author)
+def myname(message, user_to_property: dict): 
+    return user_to_property.get(message.author)
