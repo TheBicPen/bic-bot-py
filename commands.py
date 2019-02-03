@@ -17,7 +17,7 @@ def strip2(text: str, strip_text: str):
     return text[index:]
 
 def make_directory(dir):
-    if not os.path.exists(dir):
+    if not os.path.exists(dir) and dir != '':
         os.makedirs(dir)
 
 def read_file(file:str) -> list:
@@ -71,7 +71,17 @@ def set_property(user:str, prop:str, val):
     user_to_property.update({prop: val})
     write_dict_to_file(user_to_property, "user data/{0}".format(user))
 
+def get_generic_dict(d:dict, d_name, key):
+    d = read_dict_from_file("generic/{0}".format(d_name), {})
+    return d.get(key)
+
+def set_generic_dict(d:dict, d_name, key, val):
+    get_generic_dict(d, d_name, key)
+    d.update({key: val})
+    write_dict_to_file(d, "generic/{0}".format(d_name))
+
 settings = {}
+explicit_responses = {}
 
 def parse_message(message):
     msg = message.content
@@ -112,22 +122,29 @@ def parse_message(message):
                 return set_name(message, message.mentions, "call")
             elif msg_list[0] == "name":
                 return get_name(message, message.mentions)
+            elif msg_list[0] == "defexplicit":
+                return define(message, explicit_responses)
             #admin-only
             elif msg_list[0] == "eval":
                 if message.author == message.server.owner:
                     #evaluate the message only if the message author is the owner
                     return eval(strip2(message.content, "eval"))
                 else:
-                    msg = "Insufficient permissions. Must be server owner."
+                    return "Insufficient permissions. Must be server owner."
             elif msg_list[0] == "exec":
                 if message.author == message.server.owner:
                     #evaluate the message only if the message author is the owner
                     exec(strip2(message.content, "exec"))
                     return #exec doesn't return anything, so we return to not send an empty message
                 else:
-                    msg = "Insufficient permissions. Must be server owner."
+                    return "Insufficient permissions. Must be server owner."
             else:
                 return "invalid command"
+    #check for explicit responses
+    elif msg in explicit_responses:
+        return explicit_responses[msg]
+
+
 
 
 #no params, simple text
@@ -214,4 +231,11 @@ def get_name(message, user_list):
         else:
             out += "{0}, your name is {1}. ".format(user.mention, user_nick)
     return out
-    
+
+def define(message, explicit_responses:dict):
+    try:
+        command = [message.content.split('"')[1], message.content.split('"')[3]]
+    except:
+        return "invalid response format"
+    set_generic_dict(explicit_responses, "explicit_responses", command[0], command[1])
+    return "will respond to \"{0}\" with \"{1}\". ".format(command[0], command[1])

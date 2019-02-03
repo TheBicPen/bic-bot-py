@@ -1,6 +1,7 @@
 # Work with Python 3.6
 import discord
 import commands
+#import log
 
 
 #initialize
@@ -16,6 +17,7 @@ default_settings = {
         }
 settings = commands.read_dict_from_file("settings.txt", default_settings)
 commands.settings = settings
+commands.explicit_responses = commands.read_dict_from_file("generic/explicit_responses", commands.explicit_responses)
 client = discord.Client()
 
 #command_str = settings["command_str"]
@@ -55,5 +57,4 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-
 client.run(TOKEN)
