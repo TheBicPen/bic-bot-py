@@ -47,9 +47,19 @@ def read_dict_from_file(file:str, d={}):
     """
     contents = read_file(file)
     for line in contents:
-        words = line.split()
-        if len(words) > 1:
-            d.update({words[0]:" ".join(words[1:])})
+        num_semicolons = line.count(";")
+        if num_semicolons == 1: #no semicolons
+            words = line.split(";")
+            d.update({words[0]: words[1]})
+        elif num_semicolons > 1 : # semicolons
+            for ch_index in range(len(line)):
+                if line[ch_index] == ";" and line[ch_index-1: ch_index] != "\\":
+                    split_index = ch_index
+            words = [line[:split_index], line[split_index + 1:]]
+            words[0] = words[0].replace("\\", "")
+            words[1] = words[1].replace("\\", "")
+            d.update({words[0]: words[1]})
+            
     return d
 
 def write_dict_to_file(d:dict, fl:str):
@@ -59,7 +69,9 @@ def write_dict_to_file(d:dict, fl:str):
     """
     file_obj = open(fl, "w+")
     for key, value in d.items():
-        file_obj.write("{0} {1}\n".format(key, value))
+        key = key.replace(";", "\\;")
+        value = value.replace(";", "\\;")
+        file_obj.write("{0};{1}\n".format(key, value))
     file_obj.close()
     
 def get_property(user:str, prop:str):
@@ -238,4 +250,4 @@ def define(message, explicit_responses:dict):
     except:
         return "invalid response format"
     set_generic_dict(explicit_responses, "explicit_responses", command[0], command[1])
-    return "will respond to \"{0}\" with \"{1}\". ".format(command[0], command[1])
+    return "I will respond to \"{0}\" with \"{1}\". ".format(command[0], command[1])
