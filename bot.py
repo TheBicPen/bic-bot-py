@@ -8,7 +8,7 @@ import commands
 #default settings
 
 
-TOKEN = commands.read_file("token.txt")[0]
+TOKEN = commands.read_file("credentials/discord_token.txt")[0]
 
 default_settings = {
         "command_str": "bb ",

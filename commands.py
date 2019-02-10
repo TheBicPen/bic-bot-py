@@ -1,87 +1,24 @@
-import os
-
-#helper functions
-def strip1(text: str, strip_text: str): #useless wtf
-    """
-    Returns a string with strip_text stripped from the beginning of text.
-    """
-    return text.lstrip(strip_text)
-
-def strip2(text: str, strip_text: str):
-    """
-    Returns a string with everything up to and including the first occurence
-    of strip_text and 1 additional character stripped from text. 
-    If strip_text is not in text, return text[-1]
-    """
-    index = text.find(strip_text) + len(strip_text) + 1 # accounts for the space
-    return text[index:]
-
-def make_directory(dir):
-    if not os.path.exists(dir) and dir != '':
-        os.makedirs(dir)
-
-def read_file(file:str) -> list:
-    """
-    Returns the contents of the file. If the file does not exist, creates the file
-    and returns an empty list.
-    #precondition: the directory exists
-    """
-    try:
-        file_IO = open(file, "r")
-        contents = file_IO.read().splitlines()
-    except:
-        dir = os.path.split(file)[0]
-        make_directory(dir)
-        file_IO = open(file, "x")
-        contents = []
-    finally:
-        file_IO.close()
-    return contents
-
-def read_dict_from_file(file:str, d={}):
-    """
-    Reads a file where each line has 2 words separated 
-    by a space, and appends these words to dict as key-value
-    pairs. 
-    Precondition: each key is present in the file only once.
-    """
-    contents = read_file(file)
-    for line in contents:
-        num_semicolons = line.count(";")
-        if num_semicolons == 1: #no semicolons
-            words = line.split(";")
-            d.update({words[0]: words[1]})
-        elif num_semicolons > 1 : # semicolons
-            for ch_index in range(len(line)):
-                if line[ch_index] == ";" and line[ch_index-1: ch_index] != "\\":
-                    split_index = ch_index
-            words = [line[:split_index], line[split_index + 1:]]
-            words[0] = words[0].replace("\\", "")
-            words[1] = words[1].replace("\\", "")
-            d.update({words[0]: words[1]})
-            
-    return d
-
-def write_dict_to_file(d:dict, fl:str):
-    """
-    Writes the key-value pairs in d as space-separated words
-    in file. Each pair is on its own line.
-    """
-    file_obj = open(fl, "w+")
-    for key, value in d.items():
-        key = key.replace(";", "\\;")
-        value = value.replace(";", "\\;")
-        file_obj.write("{0};{1}\n".format(key, value))
-    file_obj.close()
+from helpers_generic import * #forgive me
     
-def get_property(user:str, prop:str):
+def get_user_property(user:str, prop:str):
     user_to_property = read_dict_from_file("user data/{0}".format(user), {})
     return user_to_property.get(prop)
     
-def set_property(user:str, prop:str, val):
+def set_user_property(user:str, prop:str, val):
     user_to_property = read_dict_from_file("user data/{0}".format(user))
     user_to_property.update({prop: val})
     write_dict_to_file(user_to_property, "user data/{0}".format(user))
+
+def delete_user(user_mentions:str):
+    out = ""
+    for user in user_mentions:
+        try:
+            os.remove("user data/{0}".format(user))
+            out += "Deleted {0}'s info.\n".format(user)
+        except:
+            out += "Failed to delete.\n"
+    return out
+    
 
 def get_generic_dict(d:dict, d_name, key):
     d = read_dict_from_file("generic/{0}".format(d_name), {})
@@ -94,6 +31,7 @@ def set_generic_dict(d:dict, d_name, key, val):
 
 settings = {}
 explicit_responses = {}
+pattern_responses = {}
 
 def parse_message(message):
     msg = message.content
@@ -134,8 +72,12 @@ def parse_message(message):
                 return set_name(message, message.mentions, "call")
             elif msg_list[0] == "name":
                 return get_name(message, message.mentions)
+            elif msg_list[0] == "deleteuser":
+                return delete_user(message.mentions)
             elif msg_list[0] == "defexplicit":
-                return define(message, explicit_responses)
+                return define(message, explicit_responses, "explicit_responses")
+            elif msg_list[0] == "defpattern":
+                return define(message, pattern_responses, "pattern_responses")
             #admin-only
             elif msg_list[0] == "eval":
                 if message.author == message.server.owner:
@@ -155,6 +97,10 @@ def parse_message(message):
     #check for explicit responses
     elif msg in explicit_responses:
         return explicit_responses[msg]
+    
+    else:
+        return check_pattern(msg, pattern_responses)
+
 
 
 
@@ -223,8 +169,8 @@ def set_name(message, user_list, trigger_string): #not to be confused with disco
     #not necessary, since there will be at least 1 mention following it
     #nickname = strip2(message.content, trigger_string) #command_text must be separate from the command by a space
     for user in user_list:
-        set_property(user, "nickname", nickname)
-        out += "{0}, I will call you {1}. ".format(user.mention, get_property(user, "nickname"))
+        set_user_property(user, "nickname", nickname)
+        out += "{0}, I will call you {1}. ".format(user.mention, get_user_property(user, "nickname"))
     return out
 
 def get_name(message, user_list):
@@ -237,17 +183,23 @@ def get_name(message, user_list):
         return "No valid user mentions."
     out = "" 
     for user in user_list:
-        user_nick = get_property(user, "nickname")
+        user_nick = get_user_property(user, "nickname")
         if user_nick is None:
             out += "{0}, you have no name. ".format(user.mention)
         else:
             out += "{0}, your name is {1}. ".format(user.mention, user_nick)
     return out
 
-def define(message, explicit_responses:dict):
-    try:
-        command = [message.content.split('"')[1], message.content.split('"')[3]]
-    except:
-        return "invalid response format"
-    set_generic_dict(explicit_responses, "explicit_responses", command[0], command[1])
-    return "I will respond to \"{0}\" with \"{1}\". ".format(command[0], command[1])
+def define(message, d:dict, d_name):
+   # try:
+    command = message.content.split('"')
+    set_generic_dict(d, d_name, command[1], command[3])
+    #except:
+       # return "invalid response format"
+    return "I will respond to \"{0}\" with \"{1}\". ".format(command[1], command[3])
+
+def check_pattern(msg:str, pattern_responses:dict):
+    for key in pattern_responses.keys():
+        if msg[:len(key)] == key:
+            param = strip1(msg, key)
+            return pattern_responses[key].format(param)

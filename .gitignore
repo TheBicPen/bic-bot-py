@@ -2,3 +2,7 @@
 __pycache__/commands.cpython-36.pyc
 token.txt
 user data/
+credentials/token.pickle
+credentials/
+__pycache__/log.cpython-36.pyc
+__pycache__/
