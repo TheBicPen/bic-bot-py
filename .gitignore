@@ -2,3 +2,6 @@
 __pycache__/commands.cpython-36.pyc
 token.txt
 user data/
+image-classification/
+__pycache__/
+credentials/
