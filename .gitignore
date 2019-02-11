@@ -2,6 +2,9 @@
 __pycache__/commands.cpython-36.pyc
 token.txt
 user data/
-image-classification/
+image_classification/training_images/
+image_classification/test_images/
 __pycache__/
 credentials/
+events*
+retrained*

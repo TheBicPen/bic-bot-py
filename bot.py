@@ -8,7 +8,7 @@ import commands
 #default settings
 
 
-TOKEN = commands.read_file("token.txt")[0]
+TOKEN = commands.read_file("credentials/discord_token.txt")[0]
 
 default_settings = {
         "command_str": "bb ",
@@ -34,11 +34,11 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith("!debug"):
+    elif message.content.startswith("!debug"):
         msg = 'Hello {0.author.mention}. The command string is {1}'.format(message, settings["command_str"])
 
     else:
-        msg = commands.parse_message(message)
+        msg = await commands.parse_message(message)
 
     if not msg is None:
         try:

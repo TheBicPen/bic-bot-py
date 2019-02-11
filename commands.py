@@ -1,4 +1,8 @@
 import os
+import image_classify as ic
+import urllib.request
+import aiohttp
+import asyncio
 
 #helper functions
 def strip1(text: str, strip_text: str): #useless wtf
@@ -95,7 +99,7 @@ def set_generic_dict(d:dict, d_name, key, val):
 settings = {}
 explicit_responses = {}
 
-def parse_message(message):
+async def parse_message(message):
     msg = message.content
     if msg.startswith(settings["command_str"]): 
         msg = msg[len(settings["command_str"]):] #strip the command string
@@ -155,6 +159,21 @@ def parse_message(message):
     #check for explicit responses
     elif msg in explicit_responses:
         return explicit_responses[msg]
+
+    #check image using image-classification
+    if len(message.attachments) > 0:
+        url = message.attachments[0]['url']
+        print("message contains image at:{0}".format(url))
+        #img = urllib.request.urlretrieve(url)
+        async with aiohttp.get(url) as response:
+            if response.status == 200:
+                print(response)
+                img = await response.read()
+                print(type(img))
+                session = ic.start_classify()
+                return ic.classify_image(img, session, ic.np, ic.get_classifications())
+
+        
 
 
 
