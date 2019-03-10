@@ -59,8 +59,11 @@ def parse_message(message):
                 return commit(read_file("command text/commit.txt"))
             #params: command text and message
             elif msg_list[0] == "extrathicc":
-                thicc_dict = read_dict_from_file("dictionary text/extra thicc.txt")
-                return extrathicc(message, thicc_dict)
+                thicc_dict = read_dict_from_file("dictionary text/extrathicc.txt")
+                return translate(message, "extrathicc", thicc_dict)
+            elif msg_list[0] == "leet":
+                thicc_dict = read_dict_from_file("dictionary text/leet.txt")
+                return translate(message, "leet", {})
             elif msg_list[0] == "keeb":
 	            return keeb(message, read_file("dictionary text/korean.txt"))
             #params: message and user data
@@ -142,11 +145,13 @@ def keeb(message, korean_list: list):
 	return False
 
 #params: message and command text
-def extrathicc(message, thicc_dict:dict):
+def translate(message, key:str, trans_dict:dict):
+    if trans_dict == {}:
+        read_dict_from_file("dictionary text/{0}.txt".format(key), trans_dict)
     out = ""
-    msg = strip2(message.content.upper(), "extrathicc")
+    msg = strip2(strip2(message.content.upper(), settings["command_str"]), key) # translation dictionary content must be uppercase
     for ch in msg: #dict contains uppercase letters
-        out += thicc_dict.get(ch, "")
+        out += trans_dict.get(ch, "")
     return out
 #params: message and user data
 

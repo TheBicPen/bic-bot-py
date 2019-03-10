@@ -27,7 +27,7 @@ def read_file(file:str) -> list:
     #precondition: the directory exists
     """
     try:
-        file_IO = open(file, "r")
+        file_IO = open(file, "r", encoding="utf8")
         contents = file_IO.read().splitlines()
     except:
         dir = os.path.split(file)[0]
@@ -55,10 +55,13 @@ def read_dict_from_file(file:str, d={}):
     contents = read_file(file)
     for line in contents:
         num_semicolons = line.count(";")
-        if num_semicolons == 1: #no semicolons
+        if num_semicolons == 0:
+            print("line in file formatted improperly\n")
+            return d
+        elif num_semicolons == 1: #no semicolons in text
             words = line.split(";")
             d.update({words[0]: words[1]})
-        elif num_semicolons > 1 : # semicolons
+        else: # semicolons in text
             for ch_index in range(len(line)):
                 if line[ch_index] == ";" and line[ch_index-1: ch_index] != "\\":
                     split_index = ch_index

@@ -42,14 +42,18 @@ async def on_message(message):
 
     if not msg is None:
         try:
-            msg_len = getattr(msg,"__len__")
-            if msg_len == 0:
-                return
-        except:
-            pass
-        finally:
+            # msg_len = getattr(msg,"__len__")
+            # print(msg_len)
+            # if msg_len == 0:
+            #     return
+
+            if len(msg) == 0:
+                msg = "Unable to send empty message."
             print("msg: {0}\n".format(msg))
             await client.send_message(message.channel, msg)
+        except:
+            print("some kind of attribute error in the message or something")
+
 
 @client.event
 async def on_ready():
