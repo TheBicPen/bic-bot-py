@@ -115,10 +115,9 @@ def ping(message):
 #no params, other
 def version():
     """
-    Returns the version of the program, but python doesn't really have 
-    program versions, unlike C#, so it just returns a placeholder string.
+    Returns the version of the program, but I'm oo lazy to implement this.
     """
-    return "uh python doesn't really do that"
+    return "uh I don't really do that at this point"
 
 # def get_settings(setting_to_val):
 #     """

@@ -1,11 +1,11 @@
 import os
 
 #helper functions
-def strip1(text: str, strip_text: str): #useless wtf
-    """
-    Returns a string with strip_text stripped from the beginning of text.
-    """
-    return text.lstrip(strip_text)
+# def strip1(text: str, strip_text: str): #useless wtf
+#     """
+#     Returns a string with strip_text stripped from the beginning of text.
+#     """
+#     return text.lstrip(strip_text)
 
 def strip2(text: str, strip_text: str):
     """
@@ -80,3 +80,6 @@ def write_dict_to_file(d:dict, fl:str):
         value = value.replace(";", "\\;")
         file_obj.write("{0};{1}\n".format(key, value))
     file_obj.close()
+
+# def get_trans(fl:str, d:dict):
+#     if d != {}:
