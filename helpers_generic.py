@@ -86,3 +86,13 @@ def write_dict_to_file(d:dict, fl:str):
 
 # def get_trans(fl:str, d:dict):
 #     if d != {}:
+
+def convert_string(text:str, conversion:int):
+    # convert to desired format
+    if conversion == 1: # to upper
+        text = text.upper()
+    elif conversion == 2: # to lower
+        text = text.lower()
+    elif text == 3: # aggressively to lower
+        text = text.casefold()
+    return text

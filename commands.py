@@ -145,11 +145,12 @@ def keeb(message, korean_list: list):
 	return False
 
 #params: message and command text
-def translate(message, key:str, trans_dict:dict):
+def translate(message:str, key:str, trans_dict:dict, convert_text=1):
     if trans_dict == {}:
         read_dict_from_file("dictionary text/{0}.txt".format(key), trans_dict)
     out = ""
-    msg = strip2(strip2(message.content.upper(), settings["command_str"]), key) # translation dictionary content must be uppercase
+    msg = strip2(strip2(message.content, settings["command_str"]), key)
+    msg = convert_string(msg, convert_text)
     for ch in msg: #dict contains uppercase letters
         out += trans_dict.get(ch, ch)
     return out
