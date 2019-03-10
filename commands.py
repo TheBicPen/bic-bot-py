@@ -62,8 +62,8 @@ def parse_message(message):
                 thicc_dict = read_dict_from_file("dictionary text/extrathicc.txt")
                 return translate(message, "extrathicc", thicc_dict)
             elif msg_list[0] == "leet":
-                thicc_dict = read_dict_from_file("dictionary text/leet.txt")
-                return translate(message, "leet", {})
+                leet_dict = read_dict_from_file("dictionary text/leet.txt")
+                return translate(message, "leet", leet_dict)
             elif msg_list[0] == "keeb":
 	            return keeb(message, read_file("dictionary text/korean.txt"))
             #params: message and user data
@@ -151,7 +151,7 @@ def translate(message, key:str, trans_dict:dict):
     out = ""
     msg = strip2(strip2(message.content.upper(), settings["command_str"]), key) # translation dictionary content must be uppercase
     for ch in msg: #dict contains uppercase letters
-        out += trans_dict.get(ch, "")
+        out += trans_dict.get(ch, ch)
     return out
 #params: message and user data
 

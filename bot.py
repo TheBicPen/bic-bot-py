@@ -48,6 +48,7 @@ async def on_message(message):
             #     return
 
             if len(msg) == 0:
+                print("msg: {0}\n".format(msg))
                 msg = "Unable to send empty message."
             print("msg: {0}\n".format(msg))
             await client.send_message(message.channel, msg)
