@@ -7,3 +7,6 @@ credentials/
 __pycache__/log.cpython-36.pyc
 __pycache__/
 image-classification/
+generic/
+events.*
+image_classification/

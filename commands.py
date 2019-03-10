@@ -199,7 +199,9 @@ def define(message, d:dict, d_name):
     return "I will respond to \"{0}\" with \"{1}\". ".format(command[1], command[3])
 
 def check_pattern(msg:str, pattern_responses:dict):
+    if pattern_responses == {}:
+        read_dict_from_file("generic/pattern_responses", pattern_responses)
     for key in pattern_responses.keys():
         if msg[:len(key)] == key:
-            param = strip1(msg, key)
+            param = msg[len(key):]
             return pattern_responses[key].format(param)
