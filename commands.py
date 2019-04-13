@@ -1,25 +1,24 @@
 from helpers_generic import * #forgive me
     
-def get_user_property(user:str, prop:str):
-    user_to_property = read_dict_from_file("user data/{0}".format(user), {})
+def get_user_property(server:str, user:str, prop:str):
+    user_to_property = read_dict_from_file("server/{1}/user data/{0}".format(user, server), {})
     return user_to_property.get(prop)
     
-def set_user_property(user:str, prop:str, val):
+def set_user_property(server:str, user:str, prop:str, val):
     user_to_property = read_dict_from_file("user data/{0}".format(user))
     user_to_property.update({prop: val})
-    write_dict_to_file(user_to_property, "user data/{0}".format(user))
+    write_dict_to_file(user_to_property, "server/{1}/user data/{0}".format(user, server))
 
-def delete_user(user_mentions:str):
+def delete_user(server:str, user_mentions:str):
     out = ""
     for user in user_mentions:
         try:
-            os.remove("user data/{0}".format(user))
+            os.remove("server/{1}/user data/{0}".format(user, server))
             out += "Deleted {0}'s info.\n".format(user)
         except:
             out += "Failed to delete.\n"
     return out
     
-
 def get_generic_dict(d:dict, d_name, key):
     d = read_dict_from_file("generic/{0}".format(d_name), {})
     return d.get(key)
@@ -76,7 +75,7 @@ def parse_message(message):
             elif msg_list[0] == "name":
                 return get_name(message, message.mentions)
             elif msg_list[0] == "deleteuser":
-                return delete_user(message.mentions)
+                return delete_user(message.server, message.mentions)
             elif msg_list[0] == "defexplicit":
                 return define(message, explicit_responses, "explicit_responses")
             elif msg_list[0] == "defpattern":
@@ -174,8 +173,8 @@ def set_name(message, user_list, trigger_string): #not to be confused with disco
     #not necessary, since there will be at least 1 mention following it
     #nickname = strip2(message.content, trigger_string) #command_text must be separate from the command by a space
     for user in user_list:
-        set_user_property(user, "nickname", nickname)
-        out += "{0}, I will call you {1}. ".format(user.mention, get_user_property(user, "nickname"))
+        set_user_property(message.server, user, "nickname", nickname)
+        out += "{0}, I will call you {1}. ".format(user.mention, get_user_property(message.server, user, "nickname"))
     return out
 
 def get_name(message, user_list):
@@ -188,7 +187,7 @@ def get_name(message, user_list):
         return "No valid user mentions."
     out = "" 
     for user in user_list:
-        user_nick = get_user_property(user, "nickname")
+        user_nick = get_user_property(message.server, user, "nickname")
         if user_nick is None:
             out += "{0}, you have no name. ".format(user.mention)
         else:
