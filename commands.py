@@ -53,12 +53,12 @@ def parse_message(message):
             #params: message only
             elif msg_list[0] == "hello":
                 return hello(message)
-            #params: global_responses only
+            #params: global_lists only
             elif msg_list[0] == "commit":
-                return list_response(read_file("global_responses/commit.txt"))
+                return list_response(read_file("global_lists/commit.txt"))
             elif msg_list[0] == "nut":
-                return list_response(read_file("global_responses/nut.txt"))
-            #params: global_responses and message
+                return list_response(read_file("global_lists/nut.txt"))
+            #params: global_lists and message
             elif msg_list[0] == "extrathicc":
                 thicc_dict = read_dict_from_file("global_dicts/extrathicc.txt")
                 return translate(message, "extrathicc", thicc_dict)
@@ -134,7 +134,7 @@ def version():
 def hello(message):
     return 'Hello {0.author.mention}'.format(message)
 
-#params: global_responses only
+#params: global_lists only
 def list_response(l:list):
     import random
     return l[random.randrange(len(l))]
@@ -145,7 +145,7 @@ def keeb(message, korean_list: list):
 			return True
 	return False
 
-#params: message and global_responses
+#params: message and global_lists
 def translate(message:str, key:str, trans_dict:dict, convert_text=1):
     if trans_dict == {}:
         read_dict_from_file("global_dicts/{0}.txt".format(key), trans_dict)
