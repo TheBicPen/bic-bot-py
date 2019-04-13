@@ -1,32 +1,32 @@
 from helpers_generic import * #forgive me
     
 def get_user_property(server:str, user:str, prop:str):
-    user_to_property = read_dict_from_file("server/{1}/user data/{0}".format(user, server), {})
+    user_to_property = read_dict_from_file("servers/{1}/user data/{0}".format(user, server), {})
     return user_to_property.get(prop)
     
 def set_user_property(server:str, user:str, prop:str, val):
-    user_to_property = read_dict_from_file("user data/{0}".format(user))
+    user_to_property = read_dict_from_file("servers/{1}/user data/{0}".format(user, server))
     user_to_property.update({prop: val})
-    write_dict_to_file(user_to_property, "server/{1}/user data/{0}".format(user, server))
+    write_dict_to_file(user_to_property, "servers/{1}/user data/{0}".format(user, server))
 
 def delete_user(server:str, user_mentions:str):
     out = ""
     for user in user_mentions:
         try:
-            os.remove("server/{1}/user data/{0}".format(user, server))
+            os.remove("servers/{1}/user data/{0}".format(user, server))
             out += "Deleted {0}'s info.\n".format(user)
         except:
             out += "Failed to delete.\n"
     return out
     
 def get_generic_dict(d:dict, d_name, key):
-    d = read_dict_from_file("generic/{0}".format(d_name), {})
+    d = read_dict_from_file("global_dicts/{0}".format(d_name), {})
     return d.get(key)
 
 def set_generic_dict(d:dict, d_name, key, val):
     get_generic_dict(d, d_name, key)
     d.update({key: val})
-    write_dict_to_file(d, "generic/{0}".format(d_name))
+    write_dict_to_file(d, "global_dicts/{0}".format(d_name))
 
 settings = {}
 explicit_responses = {}
