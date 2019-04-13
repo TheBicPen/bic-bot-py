@@ -1,12 +1,12 @@
 # Work with Python 3.6
 import discord
 import commands
+from helpers_generic import log, init_log
 #import log
 
 
 #initialize
 #default settings
-
 
 TOKEN = commands.read_file("credentials/discord_token.txt")[0]
 
@@ -58,15 +58,18 @@ async def on_message(message):
     #     print("null message")
     if not msg is None:
         try:
-            if len(str(msg)) > 0:
+            if len(str(msg)) > 2000:
+                log("message too long: " + str(len(str(msg))))
+                await client.send_message(message.channel, "message too long: " + str(len(str(msg))))
+            elif len(str(msg)) > 0: 
                 await client.send_message(message.channel, msg)
         except:
-            print("Unable to convert message of type " + str(type(msg)))
+            log("Unable to convert message of type " + str(type(msg)))
 
 @client.event
 async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-    print('------')
+    log('Logged in as')
+    log(client.user.name)
+    log(client.user.id)
+    log('------')
 client.run(TOKEN)

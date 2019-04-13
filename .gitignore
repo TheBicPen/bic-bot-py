@@ -5,3 +5,4 @@ credentials/
 image_classification/
 events.*
 token.txt
+logs/

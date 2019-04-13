@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+
 
 #helper functions
 # def strip1(text: str, strip_text: str): #useless wtf
@@ -24,7 +26,7 @@ def read_file(file:str) -> list:
     """
     Returns the contents of the file. If the file does not exist, creates the file
     and returns an empty list.
-    #precondition: the directory exists
+    #precondition: the directory exists. the file name is valid.
     """
     try:
         file_IO = open(file, "r", encoding="utf8")
@@ -32,7 +34,7 @@ def read_file(file:str) -> list:
     except:
         dir = os.path.split(file)[0]
         make_directory(dir)
-        file_IO = open(file, "x")
+        file_IO = open(os.path.normpath(file), "x")
         contents = []
     finally:
         file_IO.close()
@@ -96,3 +98,23 @@ def convert_string(text:str, conversion:int):
     elif text == 3: # aggressively to lower
         text = text.casefold()
     return text
+
+
+#logging
+
+def init_log():
+    file_name = "logs/"+ datetime.now().strftime("%Y%m%d-%H%M%S") + ".txt"
+    read_file(file_name)
+    log_file = open(file_name, "a+", encoding='utf8')
+    log_file.write("Begin logging.\n")
+    return log_file
+
+
+#idk what else to do here
+if __name__ != "__main__":
+    log_file = init_log()
+
+def log(log_string:str):
+    log_file.write(log_string + "\n")
+    log_file.flush()
+    print(log_string)
