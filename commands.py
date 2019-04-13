@@ -53,18 +53,20 @@ def parse_message(message):
             #params: message only
             elif msg_list[0] == "hello":
                 return hello(message)
-            #params: command text only
+            #params: global_responses only
             elif msg_list[0] == "commit":
-                return commit(read_file("command text/commit.txt"))
-            #params: command text and message
+                return list_response(read_file("global_responses/commit.txt"))
+            elif msg_list[0] == "nut":
+                return list_response(read_file("global_responses/nut.txt"))
+            #params: global_responses and message
             elif msg_list[0] == "extrathicc":
-                thicc_dict = read_dict_from_file("dictionary text/extrathicc.txt")
+                thicc_dict = read_dict_from_file("global_dicts/extrathicc.txt")
                 return translate(message, "extrathicc", thicc_dict)
             elif msg_list[0] == "leet":
-                leet_dict = read_dict_from_file("dictionary text/leet.txt")
+                leet_dict = read_dict_from_file("global_dicts/leet.txt")
                 return translate(message, "leet", leet_dict)
             elif msg_list[0] == "keeb":
-	            return keeb(message, read_file("dictionary text/korean.txt"))
+	            return keeb(message, read_file("global_dicts/korean.txt"))
             #params: message and user data
             elif msg_list[0] == "callme":
                 return set_name(message, [message.author], "callme")
@@ -132,21 +134,21 @@ def version():
 def hello(message):
     return 'Hello {0.author.mention}'.format(message)
 
-#params: command text only
-def commit(commit_list:list):
+#params: global_responses only
+def list_response(l:list):
     import random
-    return commit_list[random.randrange(len(commit_list))]
-	
+    return l[random.randrange(len(l))]
+
 def keeb(message, korean_list: list):
 	for letter in message.content:
 		if letter in korean_list:
 			return True
 	return False
 
-#params: message and command text
+#params: message and global_responses
 def translate(message:str, key:str, trans_dict:dict, convert_text=1):
     if trans_dict == {}:
-        read_dict_from_file("dictionary text/{0}.txt".format(key), trans_dict)
+        read_dict_from_file("global_dicts/{0}.txt".format(key), trans_dict)
     out = ""
     msg = strip2(strip2(message.content, settings["command_str"]), key)
     msg = convert_string(msg, convert_text)

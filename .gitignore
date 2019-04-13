@@ -1,12 +1,7 @@
-.vscode/settings.json
-__pycache__/commands.cpython-36.pyc
-token.txt
-user data/
-credentials/token.pickle
-credentials/
-__pycache__/log.cpython-36.pyc
+.vscode/
 __pycache__/
-image-classification/
-generic/
-events.*
+servers/
+credentials/
 image_classification/
+events.*
+token.txt
