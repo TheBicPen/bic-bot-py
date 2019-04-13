@@ -206,7 +206,7 @@ def define(message, d:dict, d_name):
 
 def check_pattern(msg:str, pattern_responses:dict):
     if pattern_responses == {}:
-        read_dict_from_file("generic/pattern_responses", pattern_responses)
+        read_dict_from_file("global_dicts/pattern_responses", pattern_responses)
     for key in pattern_responses.keys():
         if msg[:len(key)] == key:
             param = msg[len(key):]

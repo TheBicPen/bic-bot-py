@@ -17,7 +17,7 @@ default_settings = {
         }
 settings = commands.read_dict_from_file("settings.txt", default_settings)
 commands.settings = settings
-commands.explicit_responses = commands.read_dict_from_file("global_responses/explicit_responses", commands.explicit_responses)
+commands.explicit_responses = commands.read_dict_from_file("global_dicts/explicit_responses", commands.explicit_responses)
 client = discord.Client()
 
 #command_str = settings["command_str"]
