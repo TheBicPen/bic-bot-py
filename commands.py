@@ -1,4 +1,11 @@
 from helpers_generic import * #forgive me
+import os
+import image_classify as ic
+import urllib.request
+import aiohttp
+import asyncio
+
+
     
 def get_user_property(server:str, user:str, prop:str):
     user_to_property = read_dict_from_file("servers/{1}/user data/{0}".format(user, server), {})
@@ -32,7 +39,7 @@ settings = {}
 explicit_responses = {}
 pattern_responses = {}
 
-def parse_message(message):
+async def parse_message(message):
     msg = message.content
     if msg.startswith(settings["command_str"]): 
         msg = msg[len(settings["command_str"]):] #strip the command string
@@ -105,6 +112,21 @@ def parse_message(message):
     else:
         return check_pattern(msg, pattern_responses)
 
+
+    #check image using image-classification
+    if len(message.attachments) > 0:
+        url = message.attachments[0]['url']
+        print("message contains image at:{0}".format(url))
+        #img = urllib.request.urlretrieve(url)
+        async with aiohttp.get(url) as response:
+            if response.status == 200:
+                print(response)
+                img = await response.read()
+                print(type(img))
+                session = ic.start_classify()
+                return ic.classify_image(img, session, ic.np, ic.get_classifications())
+
+        
 
 
 
