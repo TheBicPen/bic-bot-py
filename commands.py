@@ -86,13 +86,13 @@ async def parse_message(message):
             elif msg_list[0] == "defpattern":
                 return define(message, pattern_responses, "pattern_responses")
             elif msg_list[0] == "imagecat":
-                return image_category(message, tf_sess, classifications)
+                return await image_category(message, tf_sess, classifications)
             elif msg_list[0] == "tfstop":
-                return stop_tf(tf_sess)
+                return stop_tf()
             #admin-only
             elif msg_list[0] == "tfstart":
                 if message.author == message.server.owner:
-                    return start_tf(tf_sess)
+                    return start_tf()
                 else:
                     return "Insufficient permissions. Must be server owner."
 
@@ -116,7 +116,7 @@ async def parse_message(message):
         return explicit_responses[msg]
     #classify image if applicable
     elif tf_sess is not None and len(message.attachments) > 0:
-        image_category(message, tf_sess, classifications)
+        await image_category(message, tf_sess, classifications)
     else:
         return check_pattern(msg, pattern_responses)
 
@@ -154,7 +154,9 @@ def version():
 def hello(message):
     return 'Hello {0.author.mention}'.format(message)
 
-def start_tf(tf_sess):
+def start_tf():
+    global tf_sess
+    global classifications
     classifications = ic.get_classifications()
     if tf_sess is not None:
         print("tensorFlow session already exists")
@@ -162,8 +164,11 @@ def start_tf(tf_sess):
     tf_sess = ic.main()
     return tf_sess
 
-def stop_tf(tf_sess):
+def stop_tf():
+    global tf_sess
+    global classifications
     tf_sess.close()
+    classifications = None
     return "ended TensorFlow session"
 
 async def image_category(message, tf_sess, classifications):
