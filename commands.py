@@ -39,7 +39,7 @@ settings = {}
 explicit_responses = {}
 pattern_responses = {}
 tf_sess = None
-classifications = []
+classifications = None
 
 async def parse_message(message):
     msg = message.content
@@ -86,9 +86,11 @@ async def parse_message(message):
             elif msg_list[0] == "defpattern":
                 return define(message, pattern_responses, "pattern_responses")
             elif msg_list[0] == "imagecat":
-                return image_category(message, tf_sess)
+                return image_category(message, tf_sess, classifications)
+            elif msg_list[0] == "tfstop":
+                return stop_tf(tf_sess)
             #admin-only
-            elif msg_list[0] == "starttf":
+            elif msg_list[0] == "tfstart":
                 if message.author == message.server.owner:
                     return start_tf(tf_sess)
                 else:
@@ -112,23 +114,15 @@ async def parse_message(message):
     #check for explicit responses
     elif msg in explicit_responses:
         return explicit_responses[msg]
-    
+    #classify image if applicable
+    elif tf_sess is not None and len(message.attachments) > 0:
+        image_category(message, tf_sess, classifications)
     else:
         return check_pattern(msg, pattern_responses)
 
 
-    #check image using image-classification
-    if len(message.attachments) > 0:
-        url = message.attachments[0]['url']
-        print("message contains image at:{0}".format(url))
-        #img = urllib.request.urlretrieve(url)
-        async with aiohttp.get(url) as response:
-            if response.status == 200:
-                print(response)
-                img = await response.read()
-                print(type(img))
-                session = ic.start_classify()
-                return ic.classify_image(img, session, ic.np, ic.get_classifications())
+
+    
 
         
 
@@ -161,21 +155,36 @@ def hello(message):
     return 'Hello {0.author.mention}'.format(message)
 
 def start_tf(tf_sess):
-    classifications = image_classify.get_classifications()
+    classifications = ic.get_classifications()
     if tf_sess is not None:
         print("tensorFlow session already exists")
         return tf_sess
-    tf_sess = image_classify.main()
+    tf_sess = ic.main()
     return tf_sess
 
+def stop_tf(tf_sess):
+    tf_sess.close()
+    return "ended TensorFlow session"
 
-def image_category(message, tf_sess):
+async def image_category(message, tf_sess, classifications):
+    if classifications is None:
+        return "image classifications not found"
     if tf_sess is None:
-        return "No tensorFlow session found"
+        return "TensorFlow session not found"
     if len(message.attachments) == 0:
-        return "Message has no valid attachments"
-    
-    result = image_classify.classify_image(message.attachments[0],tf_sess, classifications)
+        return "no valid images in message"
+
+    #check image using image-classification
+    url = message.attachments[0]['url']
+    print("message contains image at:{0}".format(url))
+    #img = urllib.request.urlretrieve(url)
+    async with aiohttp.get(url) as response:
+        print(response)
+        if response.status != 200:
+            return "unable to retrieve image"
+        img = await response.read()
+        print(type(img))
+        result = ic.classify_image(img, tf_sess, classifications)
     return "image is a {0}. {1} %% confident".format(result[0], result[1])
 
 #params: global_lists only
