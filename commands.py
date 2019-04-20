@@ -116,7 +116,7 @@ async def parse_message(message):
         return explicit_responses[msg]
     #classify image if applicable
     elif tf_sess is not None and len(message.attachments) > 0:
-        await image_category(message, tf_sess, classifications)
+        return await image_category(message, tf_sess, classifications)
     else:
         return check_pattern(msg, pattern_responses)
 
