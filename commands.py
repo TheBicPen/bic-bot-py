@@ -1,6 +1,6 @@
 from helpers_generic import * #forgive me
 import os
-import image_classify as ic
+from image_classification import image_classify as ic
 import urllib.request
 import aiohttp
 import asyncio
@@ -38,6 +38,8 @@ def set_generic_dict(d:dict, d_name, key, val):
 settings = {}
 explicit_responses = {}
 pattern_responses = {}
+tf_sess = None
+classifications = []
 
 async def parse_message(message):
     msg = message.content
@@ -47,25 +49,20 @@ async def parse_message(message):
         if len(msg_list) > 0: #check for empty command string
             #command list
 
-            #no params, simple text
             if msg_list[0] == "isbot":
                 return isbot(message)
             elif msg_list[0] == "ping":
                 return ping(message)
-            #no params, other
             elif msg_list[0] == "version":
                 return version()
             elif msg_list[0] == "settings":
                 return settings # (settings) <- no longer necessary
-            #params: message only
             elif msg_list[0] == "hello":
                 return hello(message)
-            #params: global_lists only
             elif msg_list[0] == "commit":
                 return list_response(read_file("global_lists/commit.txt"))
             elif msg_list[0] == "nut":
                 return list_response(read_file("global_lists/nut.txt"))
-            #params: global_lists and message
             elif msg_list[0] == "extrathicc":
                 thicc_dict = read_dict_from_file("global_dicts/extrathicc.txt")
                 return translate(message, "extrathicc", thicc_dict)
@@ -74,7 +71,6 @@ async def parse_message(message):
                 return translate(message, "leet", leet_dict)
             elif msg_list[0] == "keeb":
 	            return keeb(message, read_file("global_dicts/korean.txt"))
-            #params: message and user data
             elif msg_list[0] == "callme":
                 return set_name(message, [message.author], "callme")
             elif msg_list[0] == "myname":
@@ -89,7 +85,15 @@ async def parse_message(message):
                 return define(message, explicit_responses, "explicit_responses")
             elif msg_list[0] == "defpattern":
                 return define(message, pattern_responses, "pattern_responses")
+            elif msg_list[0] == "imagecat":
+                return image_category(message, tf_sess)
             #admin-only
+            elif msg_list[0] == "starttf":
+                if message.author == message.server.owner:
+                    return start_tf(tf_sess)
+                else:
+                    return "Insufficient permissions. Must be server owner."
+
             elif msg_list[0] == "eval":
                 if message.author == message.server.owner:
                     #evaluate the message only if the message author is the owner
@@ -155,6 +159,24 @@ def version():
 #params: message only
 def hello(message):
     return 'Hello {0.author.mention}'.format(message)
+
+def start_tf(tf_sess):
+    classifications = image_classify.get_classifications()
+    if tf_sess is not None:
+        print("tensorFlow session already exists")
+        return tf_sess
+    tf_sess = image_classify.main()
+    return tf_sess
+
+
+def image_category(message, tf_sess):
+    if tf_sess is None:
+        return "No tensorFlow session found"
+    if len(message.attachments) == 0:
+        return "Message has no valid attachments"
+    
+    result = image_classify.classify_image(message.attachments[0],tf_sess, classifications)
+    return "image is a {0}. {1} %% confident".format(result[0], result[1])
 
 #params: global_lists only
 def list_response(l:list):
