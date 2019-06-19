@@ -80,7 +80,7 @@ async def parse_message(message):
             elif msg_list[0] == "name":
                 return get_name(message, message.mentions)
             elif msg_list[0] == "deleteuser":
-                return delete_user(message.server, message.mentions)
+                return delete_user(message.guild, message.mentions)
             elif msg_list[0] == "defexplicit":
                 return define(message, explicit_responses, "explicit_responses")
             elif msg_list[0] == "defpattern":
@@ -91,19 +91,19 @@ async def parse_message(message):
                 return stop_tf()
             #admin-only
             elif msg_list[0] == "tfstart":
-                if message.author == message.server.owner:
+                if message.author == message.guild.owner:
                     return start_tf()
                 else:
                     return "Insufficient permissions. Must be server owner."
 
             elif msg_list[0] == "eval":
-                if message.author == message.server.owner:
+                if message.author == message.guild.owner:
                     #evaluate the message only if the message author is the owner
                     return eval(strip2(message.content, "eval"))
                 else:
                     return "Insufficient permissions. Must be server owner."
             elif msg_list[0] == "exec":
-                if message.author == message.server.owner:
+                if message.author == message.guild.owner:
                     #evaluate the message only if the message author is the owner
                     exec(strip2(message.content, "exec"))
                     return #exec doesn't return anything, so we return to not send an empty message
@@ -221,7 +221,7 @@ def set_name(message, user_list, trigger_string): #not to be confused with disco
     if settings.get("annoyed_everyone", True) and message.mention_everyone:
         return settings.get("everyone_string", "no u")
     elif message.mention_everyone:
-        for member in message.server.members:
+        for member in message.guild.members:
             user_list.append(member)
         nickname = strip2(message.content, "@everyone")
     elif user_list == [message.author]: # prevents unnecessary stripping
@@ -235,21 +235,21 @@ def set_name(message, user_list, trigger_string): #not to be confused with disco
     #not necessary, since there will be at least 1 mention following it
     #nickname = strip2(message.content, trigger_string) #command_text must be separate from the command by a space
     for user in user_list:
-        set_user_property(message.server, user, "nickname", nickname)
-        out += "{0}, I will call you {1}. ".format(user.mention, get_user_property(message.server, user, "nickname"))
+        set_user_property(message.guild, user, "nickname", nickname)
+        out += "{0}, I will call you {1}. ".format(user.mention, get_user_property(message.guild, user, "nickname"))
     return out
 
 def get_name(message, user_list):
     if settings.get("annoyed_everyone", True) and message.mention_everyone:
         return settings.get("everyone_string", "no u")
     elif message.mention_everyone:
-        for member in message.server.members:
+        for member in message.guild.members:
             user_list.append(member)
     elif len(user_list) == 0:
         return "No valid user mentions."
     out = "" 
     for user in user_list:
-        user_nick = get_user_property(message.server, user, "nickname")
+        user_nick = get_user_property(message.guild, user, "nickname")
         if user_nick is None:
             out += "{0}, you have no name. ".format(user.mention)
         else:

@@ -115,6 +115,6 @@ if __name__ != "__main__":
     log_file = init_log()
 
 def log(log_string:str):
-    log_file.write(log_string + "\n")
+    log_file.write(str(log_string) + "\n")
     log_file.flush()
     print(log_string)

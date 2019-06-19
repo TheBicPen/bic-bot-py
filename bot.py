@@ -65,11 +65,11 @@ async def on_message(message):
         try:
             if len(str(msg)) > 2000:
                 log("message too long: " + str(len(str(msg))))
-                await client.send_message(message.channel, "message too long: " + str(len(str(msg))))
+                await message.channel.send("message too long: " + str(len(str(msg))))
             elif len(str(msg)) > 0: 
-                await client.send_message(message.channel, msg)
+                await message.channel.send(msg)
         except:
-            log("Unable to convert message of type " + str(type(msg)))
+            log("Failed to process message of type " + str(type(msg)))
 
 @client.event
 async def on_ready():
@@ -77,7 +77,7 @@ async def on_ready():
     log(client.user.name)
     log(client.user.id)
     log('------')
-if type(TOKEN) == "str":
+if type(TOKEN) == type(""):
     client.run(TOKEN)
 else:
     log("Invalid token type: " + str(type(TOKEN)))
