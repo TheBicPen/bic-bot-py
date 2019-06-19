@@ -8,7 +8,12 @@ from helpers_generic import log, init_log
 #initialize
 #default settings
 
-TOKEN = commands.read_file("credentials/discord_token.txt")[0]
+TOKEN = commands.read_file("credentials/discord_token.txt")
+if len(TOKEN) > 0:
+    TOKEN = TOKEN[0]
+else:
+    log("Unable to read Discord token")
+    
 
 default_settings = {
         "command_str": "bb ",
@@ -72,4 +77,7 @@ async def on_ready():
     log(client.user.name)
     log(client.user.id)
     log('------')
-client.run(TOKEN)
+if type(TOKEN) == "str":
+    client.run(TOKEN)
+else:
+    log("Invalid token type: " + str(type(TOKEN)))
