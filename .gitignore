@@ -1,7 +1,7 @@
 .vscode/
 __pycache__/
-servers/
-credentials/
+servers/*
+credentials/*
 image_classification/test_images
 image_classification/training_images
 image_classification/retrained_graph.pb
