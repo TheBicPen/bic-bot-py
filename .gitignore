@@ -10,3 +10,6 @@ events.*
 token.txt
 logs/
 *.code-workspace
+bin
+lib
+include
