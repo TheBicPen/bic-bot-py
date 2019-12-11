@@ -116,7 +116,7 @@ async def parse_message(message):
         return explicit_responses[msg]
     #classify image if applicable
     elif tf_sess is not None and len(message.attachments) > 0:
-        return await image_category(message, tf_sess, classifications)
+        return await image_appropriate(message, tf_sess, classifications)
     else:
         return check_pattern(msg, pattern_responses)
 
@@ -173,26 +173,45 @@ def stop_tf():
     print("ended TensorFlow session")
     return "ended TensorFlow session"
 
-async def image_category(message, tf_sess, classifications):
+async def classify_attachment(message, tf_sess, classifications):
     if classifications is None:
         return "image classifications not found"
     if tf_sess is None:
         return "TensorFlow session not found"
     if len(message.attachments) == 0:
-        return "no valid images in message"
+        return "no valid attachments in message"
 
     #check image using image-classification
-    url = message.attachments[0]['url']
-    print("message contains image at:{0}".format(url))
+    attachment = message.attachments[0]
+    print("message contains attachment at:{0}".format(attachment.url))
     #img = urllib.request.urlretrieve(url)
-    async with aiohttp.get(url) as response:
-        print(response)
-        if response.status != 200:
-            return "unable to retrieve image"
-        img = await response.read()
-        print(type(img))
-        result = ic.classify_image(img, tf_sess, classifications)
-    return "image is a {0}. {1:.3f} % confident".format(result[0], result[1])
+    # async with aiohttp.get(url) as response:
+    #     print(response)
+    #     if response.status != 200:
+    #         return "unable to retrieve image"
+    #     img = await response.read()
+    #     print(type(img))
+    #     result = ic.classify_image(img, tf_sess, classifications)
+    img = await attachment.read()
+    result = ic.classify_image(img, tf_sess, classifications)
+    return (result, attachment)
+
+async def image_category(message, tf_sess, classifications):
+    result = await classify_attachment(message, tf_sess, classifications)
+    return "image {2} is {0}. {1:.2f} % confident".format(result[0][0], result[0][1], result[1].filename)
+
+async def image_appropriate(message, tf_sess, classifications, whitelist, blacklist, threshold):
+    category = classify_attachment(message, tf_sess, classifications)
+    if category[0] not in blacklist and category[0] in whitelist and category[1] > threshold:
+        return True
+    else:
+        return channel_for_cat.get(category[0], message.channel)
+
+async def move_message(message, new_channel):
+    await message.delete()
+    move_to.send("This message sent by {0} has been moved from {1}. Original message: {2}"\
+        .format(message.author, message.channel, message.content), message.attachments)
+
 
 #params: global_lists only
 def list_response(l:list):
