@@ -1,10 +1,8 @@
 from helpers_generic import * #forgive me
 import os
-from image_classification import image_classify as ic
 import urllib.request
 import aiohttp
 import asyncio
-
 
     
 def get_user_property(server:str, user:str, prop:str):
@@ -36,6 +34,7 @@ def set_generic_dict(d:dict, d_name, key, val):
     write_dict_to_file(d, "global_dicts/{0}".format(d_name))
 
 settings = {}
+modules = {}
 explicit_responses = {}
 pattern_responses = {}
 tf_sess = None
@@ -85,16 +84,20 @@ async def parse_message(message):
                 return define(message, explicit_responses, "explicit_responses")
             elif msg_list[0] == "defpattern":
                 return define(message, pattern_responses, "pattern_responses")
-            elif msg_list[0] == "imagecat":
-                return await image_category(message, tf_sess, classifications)
-            elif msg_list[0] == "tfstop":
-                return stop_tf()
-            #admin-only
-            elif msg_list[0] == "tfstart":
-                if message.author == message.guild.owner:
-                    return start_tf()
-                else:
-                    return "Insufficient permissions. Must be server owner."
+
+            #image classification
+            elif "ML" in modules:
+                from image_classification import image_classify_helpers
+                if msg_list[0] == "imagecat":
+                    return await image_classify_helpers.image_category(message, tf_sess, classifications)
+                elif msg_list[0] == "tfstop":
+                    return image_classify_helpers.stop_tf()
+                #admin-only
+                elif msg_list[0] == "tfstart":
+                    if message.author == message.guild.owner:
+                        return image_classify_helpers.start_tf()
+                    else:
+                        return "Insufficient permissions. Must be server owner."
 
             elif msg_list[0] == "eval":
                 if message.author == message.guild.owner:
@@ -115,8 +118,9 @@ async def parse_message(message):
     elif msg in explicit_responses:
         return explicit_responses[msg]
     #classify image if applicable
-    elif tf_sess is not None and len(message.attachments) > 0:
-        return await image_appropriate(message, tf_sess, classifications)
+    elif "ML" in modules and tf_sess is not None and len(message.attachments) > 0:
+        from image_classification import image_classify_helpers
+        return await image_classify_helpers.image_appropriate(message, tf_sess, classifications)
     else:
         return check_pattern(msg, pattern_responses)
 
@@ -154,58 +158,7 @@ def version():
 def hello(message):
     return 'Hello {0.author.mention}'.format(message)
 
-def start_tf():
-    global tf_sess
-    global classifications
-    classifications = ic.get_classifications()
-    if tf_sess is not None:
-        print("TensorFlow session already exists")
-        return "TensorFlow session already exists"
-    tf_sess = ic.main()
-    return "started TensorFlow session"
 
-def stop_tf():
-    global tf_sess
-    global classifications
-    tf_sess.close() # free resources used by the tf session
-    tf_sess = None # remove the reference to it
-    classifications = None
-    print("ended TensorFlow session")
-    return "ended TensorFlow session"
-
-async def classify_attachment(message, tf_sess, classifications):
-    if classifications is None:
-        return "image classifications not found"
-    if tf_sess is None:
-        return "TensorFlow session not found"
-    if len(message.attachments) == 0:
-        return "no valid attachments in message"
-
-    #check image using image-classification
-    attachment = message.attachments[0]
-    print("message contains attachment at:{0}".format(attachment.url))
-    #img = urllib.request.urlretrieve(url)
-    # async with aiohttp.get(url) as response:
-    #     print(response)
-    #     if response.status != 200:
-    #         return "unable to retrieve image"
-    #     img = await response.read()
-    #     print(type(img))
-    #     result = ic.classify_image(img, tf_sess, classifications)
-    img = await attachment.read()
-    result = ic.classify_image(img, tf_sess, classifications)
-    return (result, attachment)
-
-async def image_category(message, tf_sess, classifications):
-    result = await classify_attachment(message, tf_sess, classifications)
-    return "image {2} is {0}. {1:.2f} % confident".format(result[0][0], result[0][1], result[1].filename)
-
-async def image_appropriate(message, tf_sess, classifications, whitelist, blacklist, threshold):
-    category = classify_attachment(message, tf_sess, classifications)
-    if category[0] not in blacklist and category[0] in whitelist and category[1] > threshold:
-        return True
-    else:
-        return channel_for_cat.get(category[0], message.channel)
 
 async def move_message(message, new_channel):
     await message.delete()
