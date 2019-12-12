@@ -114,6 +114,12 @@ async def parse_message(message):
                     return #exec doesn't return anything, so we return to not send an empty message
                 else:
                     return "Insufficient permissions. Must be server owner."
+            elif msg_list[0] == "ip":
+                if message.author == message.guild.owner:
+                    #evaluate the message only if the message author is the owner
+                    return os.system("wget -qO- https://ipecho.net/plain")
+                else:
+                    return "Insufficient permissions. Must be server owner."
             else:
                 return "invalid command"
     #check for explicit responses
