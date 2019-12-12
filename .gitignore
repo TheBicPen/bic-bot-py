@@ -8,7 +8,8 @@ image_classification/retrained_graph.pb
 image_classification/retrained_labels.txt
 events.*
 token.txt
-logs/
+logs
+user_data
 *.code-workspace
 bin
 lib
