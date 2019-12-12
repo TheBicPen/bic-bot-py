@@ -21,8 +21,10 @@ default_settings = {
         "everyone_string": "no u"
         }
 settings = commands.read_dict_from_file("settings.txt", default_settings)
-commands.settings = settings
-commands.explicit_responses = commands.read_dict_from_file("global_dicts/explicit_responses", commands.explicit_responses)
+explicit_responses = commands.read_dict_from_file("global_dicts/explicit_responses")
+pattern_responses = commands.read_dict_from_file("global_dicts/pattern_responses")
+modules = {}
+parser = commands.parser(settings, modules, explicit_responses, pattern_responses)
 client = discord.Client()
 
 #command_str = settings["command_str"]
@@ -43,7 +45,7 @@ async def on_message(message):
         msg = 'Hello {0.author.mention}. The command string is {1}'.format(message, settings["command_str"])
 
     else:
-        msg = await commands.parse_message(message)
+        msg = await parser.parse_message(message)
 
     # if not msg is None:
     #     try:

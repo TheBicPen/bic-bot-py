@@ -39,9 +39,11 @@ class parser:
     modules = {}
     explicit_responses = {}
     pattern_responses = {}
-    def __init__(self, settings:dict, modules:dict):
+    def __init__(self, settings:dict, modules:dict, explicit_responses:dict, pattern_responses:dict):
         self.settings = settings
         self.modules = modules
+        self.explicit_responses = explicit_responses
+        self.pattern_responses = pattern_responses
         import commands_generic
         if "ML" in modules:
             from image_classification import image_classify_helpers
