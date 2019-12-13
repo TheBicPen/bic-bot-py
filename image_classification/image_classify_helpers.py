@@ -1,5 +1,5 @@
 
-import image_classify as ic
+from . import image_classify as ic
 
 tf_sess = None
 classifications = None

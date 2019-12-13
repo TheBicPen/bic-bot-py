@@ -57,8 +57,9 @@ class parser:
             try:
                 self.modules[module] = import_module(module)
                 print("Imported module " + str(module))
-            except:
+            except Exception as e:
                 print("Failed to import module " + str(module))
+                print(str(e))
                 return None
 
     async def parse_message(self, message):
