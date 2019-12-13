@@ -112,16 +112,24 @@ class parser:
                     return self.modules["commands_generic"].define(message, pattern_responses, "pattern_responses")
 
                 # image classification
-                elif msg_list[0] == "imagecat" and consts.ML_lib in self.modules:
-                    return await self.modules[consts.ML_lib].image_category(message, tf_sess, classifications)
-                elif msg_list[0] == "tfstop" and consts.ML_lib in self.modules:
-                    return self.modules[consts.ML_lib].stop_tf()
-                # admin-only
-                elif msg_list[0] == "tfstart" and consts.ML_lib in self.modules:
-                    if message.author == message.guild.owner:
-                        return self.modules[consts.ML_lib].start_tf()
+                elif msg_list[0] == "imagecat":
+                    if consts.ML_lib not in self.modules:
+                        return "Image classification module inactive"
                     else:
+                        return await self.modules[consts.ML_lib].image_category(message, tf_sess, classifications)
+                elif msg_list[0] == "tfstop":
+                    if consts.ML_lib not in self.modules:
+                        return "Image classification module inactive"
+                    else:
+                        return self.modules[consts.ML_lib].stop_tf()
+                # admin-only
+                elif msg_list[0] == "tfstart":
+                    if message.author != message.guild.owner:
                         return "Insufficient permissions. Must be server owner."
+                    elif consts.ML_lib not in self.modules:
+                        return "Image classification module inactive"
+                    else:
+                        return self.modules[consts.ML_lib].start_tf()
 
                 # static debug/admin commands
                 elif msg_list[0] == "eval":
