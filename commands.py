@@ -112,9 +112,9 @@ class parser:
 
                 # image classification
                 elif msg_list[0] == "imagecat" and "image_classification.image_classify_helpers" in self.modules:
-                    return await self.modules["image_classify_helpers"].image_category(message, tf_sess, classifications)
+                    return await self.modules["image_classification.image_classify_helpers"].image_category(message, tf_sess, classifications)
                 elif msg_list[0] == "tfstop" and "image_classification.image_classify_helpers" in self.modules:
-                    return self.modules["image_classify_helpers"].stop_tf()
+                    return self.modules["image_classification.image_classify_helpers"].stop_tf()
                 # admin-only
                 elif msg_list[0] == "tfstart" and "image_classification.image_classify_helpers" in self.modules:
                     if message.author == message.guild.owner:
