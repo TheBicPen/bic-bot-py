@@ -2,10 +2,10 @@
 __pycache__/
 servers/*
 credentials/*
-image_classification/test_images
-image_classification/training_images
-image_classification/retrained_graph.pb
-image_classification/retrained_labels.txt
+*test_images
+*training_images
+*retrained_graph.pb
+*retrained_labels.txt
 events.*
 token.txt
 logs
