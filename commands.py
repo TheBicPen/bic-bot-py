@@ -39,6 +39,7 @@ class parser:
     modules = {}
     explicit_responses = {}
     pattern_responses = {}
+    commands_generic=None
     def __init__(self, settings:dict, modules:dict, explicit_responses:dict, pattern_responses:dict):
         self.settings = settings
         self.modules = modules
@@ -50,14 +51,14 @@ class parser:
 
     async def parse_message(self, message):
         msg = message.content
-        if msg.startswith(settings["command_str"]): 
-            msg = msg[len(settings["command_str"]):] #strip the command string
+        if msg.startswith(self.settings["command_str"]): 
+            msg = msg[len(self.settings["command_str"]):] #strip the command string
             msg_list = msg.split()
             if len(msg_list) > 0: #check for empty command string
                 #command list
 
                 if msg_list[0] == "isbot":
-                    return commands_generic.isbot(message)
+                    return self.commands_generic.isbot(message)
                 elif msg_list[0] == "ping":
                     return commands_generic.ping(message)
                 elif msg_list[0] == "version":
@@ -127,8 +128,8 @@ class parser:
                 else:
                     return "invalid command"
         #check for explicit responses
-        elif msg in explicit_responses:
-            return explicit_responses[msg]
+        elif msg in self.explicit_responses:
+            return self.explicit_responses[msg]
         #classify image if applicable
         elif "ML" in modules and tf_sess is not None and len(message.attachments) > 0:
             from image_classification import image_classify_helpers
