@@ -4,6 +4,7 @@ import image_classify as ic
 tf_sess = None
 classifications = None
 
+
 def start_tf():
     global tf_sess
     global classifications
@@ -14,14 +15,16 @@ def start_tf():
     tf_sess = ic.main()
     return "started TensorFlow session"
 
+
 def stop_tf():
     global tf_sess
     global classifications
-    tf_sess.close() # free resources used by the tf session
-    tf_sess = None # remove the reference to it
+    tf_sess.close()  # free resources used by the tf session
+    tf_sess = None  # remove the reference to it
     classifications = None
     print("ended TensorFlow session")
     return "ended TensorFlow session"
+
 
 async def classify_attachment(message, tf_sess, classifications):
     if classifications is None:
@@ -31,7 +34,7 @@ async def classify_attachment(message, tf_sess, classifications):
     if len(message.attachments) == 0:
         return "no valid attachments in message"
 
-    #check image using image-classification
+    # check image using image-classification
     attachment = message.attachments[0]
     print("message contains attachment at:{0}".format(attachment.url))
     #img = urllib.request.urlretrieve(url)
@@ -46,9 +49,11 @@ async def classify_attachment(message, tf_sess, classifications):
     result = ic.classify_image(img, tf_sess, classifications)
     return (result, attachment)
 
+
 async def image_category(message, tf_sess, classifications):
     result = await classify_attachment(message, tf_sess, classifications)
     return "image {2} is {0}. {1:.2f} % confident".format(result[0][0], result[0][1], result[1].filename)
+
 
 async def image_appropriate(message, tf_sess, classifications, whitelist, blacklist, threshold):
     category = classify_attachment(message, tf_sess, classifications)
