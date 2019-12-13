@@ -111,14 +111,14 @@ class parser:
                     return self.modules["commands_generic"].define(message, pattern_responses, "pattern_responses")
 
                 # image classification
-                elif msg_list[0] == "imagecat" and "ML" in self.modules:
+                elif msg_list[0] == "imagecat" and "image_classification.image_classify_helpers" in self.modules:
                     return await self.modules["image_classify_helpers"].image_category(message, tf_sess, classifications)
-                elif msg_list[0] == "tfstop" and "ML" in self.modules:
+                elif msg_list[0] == "tfstop" and "image_classification.image_classify_helpers" in self.modules:
                     return self.modules["image_classify_helpers"].stop_tf()
                 # admin-only
-                elif msg_list[0] == "tfstart" and "ML" in self.modules:
+                elif msg_list[0] == "tfstart" and "image_classification.image_classify_helpers" in self.modules:
                     if message.author == message.guild.owner:
-                        return self.modules["image_classification/image_classify_helpers"].start_tf()
+                        return self.modules["image_classification.image_classify_helpers"].start_tf()
                     else:
                         return "Insufficient permissions. Must be server owner."
 
@@ -154,8 +154,7 @@ class parser:
         elif msg in self.explicit_responses:
             return self.explicit_responses[msg]
         # classify image if applicable
-        elif "image_classification/image_classify_helpers" in self.modules and tf_sess is not None and len(message.attachments) > 0:
-            from image_classification import image_classify_helpers
-            return await image_classify_helpers.image_appropriate(message, tf_sess, classifications)
+        elif "image_classification.image_classify_helpers" in self.modules and tf_sess is not None and len(message.attachments) > 0:
+            return await self.modules["image_classification.image_classify_helpers"].image_appropriate(message, tf_sess, classifications)
         else:
             return self.modules["commands_generic"].check_pattern(msg, pattern_responses)
