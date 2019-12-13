@@ -4,7 +4,7 @@ import urllib.request
 import aiohttp
 import asyncio
 
-
+from importlib import import_module
     
 def get_user_property(server:str, user:str, prop:str):
     user_to_property = read_dict_from_file("servers/{1}/user_data/{0}".format(user, server), {})
@@ -39,15 +39,17 @@ class parser:
     modules = {}
     explicit_responses = {}
     pattern_responses = {}
-    commands_generic=None
-    def __init__(self, settings:dict, modules:dict, explicit_responses:dict, pattern_responses:dict):
+    def __init__(self, settings:dict, modules:list, explicit_responses:dict, pattern_responses:dict):
         self.settings = settings
-        self.modules = modules
         self.explicit_responses = explicit_responses
         self.pattern_responses = pattern_responses
-        import commands_generic
-        if "ML" in modules:
-            from image_classification import image_classify_helpers
+        for module in modules:
+            try:
+                self.modules[module] = import_module(module)
+                print("Imported module " + str(module))
+            except:
+                print("Failed to import module " + str(module))
+                return None
 
     async def parse_message(self, message):
         msg = message.content
@@ -58,54 +60,55 @@ class parser:
                 #command list
 
                 if msg_list[0] == "isbot":
-                    return self.commands_generic.isbot(message)
+                    return self.modules["commands_generic"].isbot(message)
                 elif msg_list[0] == "ping":
-                    return commands_generic.ping(message)
+                    return self.modules["commands_generic"].ping(message)
                 elif msg_list[0] == "version":
-                    return commands_generic.version()
+                    return self.modules["commands_generic"].version()
                 elif msg_list[0] == "settings":
-                    return commands_generic.settings # (settings) <- no longer necessary
+                    return self.modules["commands_generic"].settings # (settings) <- no longer necessary
                 elif msg_list[0] == "hello":
-                    return commands_generic.hello(message)
+                    return self.modules["commands_generic"].hello(message)
                 elif msg_list[0] == "commit":
-                    return commands_generic.list_response(read_file("global_lists/commit.txt"))
+                    return self.modules["commands_generic"].list_response(read_file("global_lists/commit.txt"))
                 elif msg_list[0] == "nut":
-                    return commands_generic.list_response(read_file("global_lists/nut.txt"))
+                    return self.modules["commands_generic"].list_response(read_file("global_lists/nut.txt"))
                 elif msg_list[0] == "extrathicc":
                     thicc_dict = read_dict_from_file("global_dicts/extrathicc.txt")
-                    return commands_generic.translate(message, "extrathicc", thicc_dict)
+                    return self.modules["commands_generic"].translate(message, "extrathicc", thicc_dict)
                 elif msg_list[0] == "leet":
                     leet_dict = read_dict_from_file("global_dicts/leet.txt")
-                    return commands_generic.translate(message, "leet", leet_dict)
+                    return self.modules["commands_generic"].translate(message, "leet", leet_dict)
                 elif msg_list[0] == "keeb":
-                    return commands_generic.keeb(message, read_file("global_dicts/korean.txt"))
+                    return self.modules["commands_generic"].keeb(message, read_file("global_dicts/korean.txt"))
                 elif msg_list[0] == "callme":
-                    return commands_generic.set_name(message, [message.author], "callme")
+                    return self.modules["commands_generic"].set_name(message, [message.author], "callme")
                 elif msg_list[0] == "myname":
-                    return commands_generic.get_name(message, [message.author])
+                    return self.modules["commands_generic"].get_name(message, [message.author])
                 elif msg_list[0] == "call":
-                    return commands_generic.set_name(message, message.mentions, "call")
+                    return self.modules["commands_generic"].set_name(message, message.mentions, "call")
                 elif msg_list[0] == "name":
-                    return commands_generic.get_name(message, message.mentions)
+                    return self.modules["commands_generic"].get_name(message, message.mentions)
                 elif msg_list[0] == "deleteuser":
                     return delete_user(message.guild, message.mentions)
                 elif msg_list[0] == "defexplicit":
-                    return commands_generic.define(message, explicit_responses, "explicit_responses")
+                    return self.modules["commands_generic"].define(message, explicit_responses, "explicit_responses")
                 elif msg_list[0] == "defpattern":
-                    return commands_generic.define(message, pattern_responses, "pattern_responses")
+                    return self.modules["commands_generic"].define(message, pattern_responses, "pattern_responses")
 
                 # image classification
                 elif msg_list[0] == "imagecat" and "ML" in self.modules:
-                    return await image_classify_helpers.image_category(message, tf_sess, classifications)
+                    return await self.modules["image_classify_helpers"].image_category(message, tf_sess, classifications)
                 elif msg_list[0] == "tfstop" and "ML" in self.modules:
-                    return image_classify_helpers.stop_tf()
+                    return self.modules["image_classify_helpers"].stop_tf()
                 #admin-only
                 elif msg_list[0] == "tfstart" and "ML" in self.modules:
                     if message.author == message.guild.owner:
-                        return image_classify_helpers.start_tf()
+                        return self.modules["image_classification/image_classify_helpers"].start_tf()
                     else:
                         return "Insufficient permissions. Must be server owner."
 
+                # static debug/admin commands
                 elif msg_list[0] == "eval":
                     if message.author == message.guild.owner:
                         #evaluate the message only if the message author is the owner
@@ -125,14 +128,20 @@ class parser:
                         return os.system("wget -qO- https://ipecho.net/plain")
                     else:
                         return "Insufficient permissions. Must be server owner."
+                elif msg_list[0] == "modules":
+                    if message.author == message.guild.owner:
+                        #evaluate the message only if the message author is the owner
+                        return self.modules
+                    else:
+                        return "Insufficient permissions. Must be server owner."
                 else:
                     return "invalid command"
         #check for explicit responses
         elif msg in self.explicit_responses:
             return self.explicit_responses[msg]
         #classify image if applicable
-        elif "ML" in modules and tf_sess is not None and len(message.attachments) > 0:
+        elif "image_classification/image_classify_helpers" in self.modules and tf_sess is not None and len(message.attachments) > 0:
             from image_classification import image_classify_helpers
             return await image_classify_helpers.image_appropriate(message, tf_sess, classifications)
         else:
-            return commands_generic.check_pattern(msg, pattern_responses)
+            return self.modules["commands_generic"].check_pattern(msg, pattern_responses)

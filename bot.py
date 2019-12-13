@@ -23,7 +23,7 @@ default_settings = {
 settings = commands.read_dict_from_file("settings.txt", default_settings)
 explicit_responses = commands.read_dict_from_file("global_dicts/explicit_responses")
 pattern_responses = commands.read_dict_from_file("global_dicts/pattern_responses")
-modules = {}
+modules = {"commands_generic", "image_classification/image_classify_helpers"}
 parser = commands.parser(settings, modules, explicit_responses, pattern_responses)
 client = discord.Client()
 
