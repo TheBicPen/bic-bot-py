@@ -148,7 +148,7 @@ class parser:
                 elif msg_list[0] == "ip":
                     if message.author == message.guild.owner:
                         # evaluate the message only if the message author is the owner
-                        return os.system("wget -qO- https://ipecho.net/plain")
+                        return os.system(consts.IP_command)
                     else:
                         return "Insufficient permissions. Must be server owner."
                 elif msg_list[0] == "modules":
