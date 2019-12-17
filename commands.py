@@ -8,13 +8,13 @@ import consts
 from importlib import import_module
 
 
-def get_user_property(server: str, user: str, prop: str):
+def get_user_property(server: str, user: str, prop: str, help=False):
     user_to_property = read_dict_from_file(
         "servers/{1}/user_data/{0}".format(user, server), {})
     return user_to_property.get(prop)
 
 
-def set_user_property(server: str, user: str, prop: str, val):
+def set_user_property(server: str, user: str, prop: str, val, help=False):
     user_to_property = read_dict_from_file(
         "servers/{1}/user_data/{0}".format(user, server))
     user_to_property.update({prop: val})
@@ -22,7 +22,7 @@ def set_user_property(server: str, user: str, prop: str, val):
         user_to_property, "servers/{1}/user_data/{0}".format(user, server))
 
 
-def delete_user(server: str, user_mentions: str):
+def delete_user(server: str, user_mentions: str, help=False):
     out = ""
     for user in user_mentions:
         try:
@@ -33,12 +33,12 @@ def delete_user(server: str, user_mentions: str):
     return out
 
 
-def get_generic_dict(d: dict, d_name, key):
+def get_generic_dict(d: dict, d_name, key, help=False):
     d = read_dict_from_file("global_dicts/{0}".format(d_name), {})
     return d.get(key)
 
 
-def set_generic_dict(d: dict, d_name, key, val):
+def set_generic_dict(d: dict, d_name, key, val, help=False):
     get_generic_dict(d, d_name, key)
     d.update({key: val})
     write_dict_to_file(d, "global_dicts/{0}".format(d_name))
@@ -64,64 +64,77 @@ class parser:
                 return None
 
     async def parse_message(self, message):
+        cmd_help = False
+        help_str = "help"
         msg = message.content
         if msg.startswith(self.settings["command_str"]):
             # strip the command string
             msg = msg[len(self.settings["command_str"]):]
+
+            # # check whether the message is for help with a command
+            # if msg.startswith(help_str):
+            #     cmd_help = True
+            #     msg = msg[len(help_str):]
+
             msg_list = msg.split()
             if len(msg_list) > 0:  # check for empty command string
                 # command list
 
-                if msg_list[0] == "isbot":
-                    return self.modules["commands_generic"].isbot(message)
+                if msg_list[0] == help_str:
+                    if len(msg_list > 1):
+                        return func_doc(msg_list[1])
+                    else:
+                        return consts.cmd_list
+
+                elif msg_list[0] == "isbot":
+                    return self.modules["commands_generic"].isbot(message, help=cmd_help)
                 elif msg_list[0] == "ping":
-                    return self.modules["commands_generic"].ping(message)
+                    return self.modules["commands_generic"].ping(message, help=cmd_help)
                 elif msg_list[0] == "version":
-                    return self.modules["commands_generic"].version()
+                    return self.modules["commands_generic"].version(help=cmd_help)
                 elif msg_list[0] == "settings":
                     # (settings) <- no longer necessary
                     return self.modules["commands_generic"].settings
                 elif msg_list[0] == "hello":
-                    return self.modules["commands_generic"].hello(message)
+                    return self.modules["commands_generic"].hello(message, help=cmd_help)
                 elif msg_list[0] == "commit":
                     return self.modules["commands_generic"].list_response(read_file("global_lists/commit.txt"))
                 elif msg_list[0] == "nut":
                     return self.modules["commands_generic"].list_response(read_file("global_lists/nut.txt"))
                 elif msg_list[0] == "extrathicc":
-                    thicc_dict = read_dict_from_file(
-                        "global_dicts/extrathicc.txt")
-                    return self.modules["commands_generic"].translate(message, "extrathicc", thicc_dict)
+                    thicc_dict = read_dict_from_file("global_dicts/extrathicc.txt")
+                    return self.modules["commands_generic"].translate(message, "extrathicc", thicc_dict, help=cmd_help)
                 elif msg_list[0] == "leet":
                     leet_dict = read_dict_from_file("global_dicts/leet.txt")
-                    return self.modules["commands_generic"].translate(message, "leet", leet_dict)
+                    return self.modules["commands_generic"].translate(message, "leet", leet_dict, help=cmd_help)
                 elif msg_list[0] == "keeb":
                     return self.modules["commands_generic"].keeb(message, read_file("global_dicts/korean.txt"))
                 elif msg_list[0] == "callme":
-                    return self.modules["commands_generic"].set_name(message, [message.author], "callme")
+                    return self.modules["commands_generic"].set_name(message, [message.author], "callme", help=cmd_help)
                 elif msg_list[0] == "myname":
-                    return self.modules["commands_generic"].get_name(message, [message.author])
+                    return self.modules["commands_generic"].get_name(message, [message.author], help=cmd_help)
                 elif msg_list[0] == "call":
-                    return self.modules["commands_generic"].set_name(message, message.mentions, "call")
+                    return self.modules["commands_generic"].set_name(message, message.mentions, "call", help=cmd_help)
                 elif msg_list[0] == "name":
-                    return self.modules["commands_generic"].get_name(message, message.mentions)
+                    return self.modules["commands_generic"].get_name(message, message.mentions, help=cmd_help)
                 elif msg_list[0] == "deleteuser":
-                    return delete_user(message.guild, message.mentions)
+                    return delete_user(message.guild, message.mentions, help=cmd_help)
                 elif msg_list[0] == "defexplicit":
-                    return self.modules["commands_generic"].define(message, explicit_responses, "explicit_responses")
+                    return self.modules["commands_generic"].define(message, explicit_responses, "explicit_responses", help=cmd_help)
                 elif msg_list[0] == "defpattern":
-                    return self.modules["commands_generic"].define(message, pattern_responses, "pattern_responses")
+                    return self.modules["commands_generic"].define(message, pattern_responses, "pattern_responses", help=cmd_help)
 
                 # image classification
                 elif msg_list[0] == "imagecat":
                     if consts.ML_lib not in self.modules:
                         return "Image classification module inactive"
                     else:
-                        return await self.modules[consts.ML_lib].image_category(message, tf_sess, classifications)
+                        return await self.modules[consts.ML_lib].image_category(message, tf_sess, classifications, help=cmd_help)
                 elif msg_list[0] == "tfstop":
                     if consts.ML_lib not in self.modules:
                         return "Image classification module inactive"
                     else:
-                        return self.modules[consts.ML_lib].stop_tf()
+                        return self.modules[consts.ML_lib].stop_tf(help=cmd_help)
                 # admin-only
                 elif msg_list[0] == "tfstart":
                     if message.author != message.guild.owner:
@@ -129,7 +142,7 @@ class parser:
                     elif consts.ML_lib not in self.modules:
                         return "Image classification module inactive"
                     else:
-                        return self.modules[consts.ML_lib].start_tf()
+                        return self.modules[consts.ML_lib].start_tf(help=cmd_help)
 
                 # static debug/admin commands
                 elif msg_list[0] == "eval":
@@ -169,4 +182,4 @@ class parser:
         elif consts.ML_lib in self.modules and tf_sess is not None and len(message.attachments) > 0:
             return await self.modules[consts.ML_lib].image_appropriate(message, tf_sess, classifications)
         else:
-            return self.modules["commands_generic"].check_pattern(msg, pattern_responses)
+            return self.modules["commands_generic"].check_pattern(msg, pattern_responses, help=cmd_help)

@@ -115,6 +115,13 @@ def check_admin(message):
     except:
         return 0
 
+
+def func_doc(func):
+    """
+    Returns the docstring for a function by name
+    """
+    return globals()[func].__doc__
+
 #logging
 
 def init_log():
@@ -133,3 +140,4 @@ def log(log_string:str):
     log_file.write(str(log_string) + "\n")
     log_file.flush()
     print(log_string)
+

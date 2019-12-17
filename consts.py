@@ -10,3 +10,8 @@ default_settings = {
     "annoyed_everyone": True,
     "everyone_string": "no u"
 }
+
+# a list of commands - this may be replaced with a mor dynamic solution in the future
+cmd_list = "help, isbot, ping, version, settings, hello, commit, nut, extrathicc, \
+        leet, keeb, callme, myname, call, name, deleteuser, defexplicit, defpattern, imagecat, tfstop, tfstart, \
+        eval, exec, ip, modules"

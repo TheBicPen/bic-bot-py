@@ -5,17 +5,19 @@ from helpers_generic import *  # forgive me
 # no params, simple text
 
 
-def isbot(message):
+def isbot(message, help=False):
+    if help:
+        return 
     return "yes"
 
 
-def ping(message):
+def ping(message, help=False):
     return "pong!"
 
 # no params, other
 
 
-def version():
+def version(help=False):
     """
     Returns the version of the program, but I'm oo lazy to implement this.
     """
@@ -31,7 +33,7 @@ def version():
 # params: message only
 
 
-def hello(message):
+def hello(message, help=False):
     return 'Hello {0.author.mention}'.format(message)
 
 
@@ -42,12 +44,12 @@ async def move_message(message, new_channel):
 
 
 # params: global_lists only
-def list_response(l: list):
+def list_response(l: list, help=False):
     import random
     return l[random.randrange(len(l))]
 
 
-def keeb(message, korean_list: list):
+def keeb(message, korean_list: list, help=False):
     for letter in message.content:
         if letter in korean_list:
             return True
@@ -56,7 +58,7 @@ def keeb(message, korean_list: list):
 #params: message and global_lists
 
 
-def translate(message: str, key: str, trans_dict: dict, convert_text=1):
+def translate(message: str, key: str, trans_dict: dict, convert_text=1, help=False):
     if trans_dict == {}:
         read_dict_from_file("global_dicts/{0}.txt".format(key), trans_dict)
     out = ""
@@ -68,7 +70,7 @@ def translate(message: str, key: str, trans_dict: dict, convert_text=1):
 #params: message and user_data
 
 
-def set_name(message, user_list, trigger_string):  # not to be confused with discord nickname
+def set_name(message, user_list, trigger_string, help=False):  # not to be confused with discord nickname
     if settings.get("annoyed_everyone", True) and message.mention_everyone:
         return settings.get("everyone_string", "no u")
     elif message.mention_everyone:
@@ -92,7 +94,7 @@ def set_name(message, user_list, trigger_string):  # not to be confused with dis
     return out
 
 
-def get_name(message, user_list):
+def get_name(message, user_list, help=False):
     if settings.get("annoyed_everyone", True) and message.mention_everyone:
         return settings.get("everyone_string", "no u")
     elif message.mention_everyone:
@@ -102,7 +104,7 @@ def get_name(message, user_list):
         return "No valid user mentions."
     out = ""
     for user in user_list:
-        user_nick = get_user_property(message.guild, user, "nickname")
+        user_nick = get_user_property(message.guild, user, "nickname", help=False)
         if user_nick is None:
             out += "{0}, you have no name. ".format(user.mention)
         else:
@@ -110,7 +112,7 @@ def get_name(message, user_list):
     return out
 
 
-def define(message, d: dict, d_name):
+def define(message, d: dict, d_name, help=False):
    # try:
     command = message.content.split('"')
     set_generic_dict(d, d_name, command[1], command[3])
@@ -119,7 +121,7 @@ def define(message, d: dict, d_name):
     return "I will respond to \"{0}\" with \"{1}\". ".format(command[1], command[3])
 
 
-def check_pattern(msg: str, pattern_responses: dict):
+def check_pattern(msg: str, pattern_responses: dict, help=False):
     if pattern_responses == {}:
         read_dict_from_file(
             "global_dicts/pattern_responses", pattern_responses)
