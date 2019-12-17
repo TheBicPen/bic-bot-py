@@ -148,7 +148,8 @@ class parser:
                 elif msg_list[0] == "ip":
                     if message.author == message.guild.owner:
                         # evaluate the message only if the message author is the owner
-                        return os.system(consts.IP_command)
+                        stream = os.popen(consts.IP_command)
+                        return stream.read()
                     else:
                         return "Insufficient permissions. Must be server owner."
                 elif msg_list[0] == "modules":
