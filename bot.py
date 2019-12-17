@@ -17,12 +17,7 @@ else:
     log("Unable to read Discord token")
 
 
-default_settings = {
-    "command_str": "bb ",
-    "annoyed_everyone": True,
-    "everyone_string": "no u"
-}
-settings = commands.read_dict_from_file("settings.txt", default_settings)
+settings = commands.read_dict_from_file("settings.txt", consts.default_settings)
 explicit_responses = commands.read_dict_from_file(
     "global_dicts/explicit_responses")
 pattern_responses = commands.read_dict_from_file(

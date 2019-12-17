@@ -1,0 +1,13 @@
+ytrsfdghjgfd;sdhjkkhsdldhsfs
+semicolon:\;asd;value
+back\slash;slashed
+doubleback\\slash;slashed
+tripleback\\\slash;slashed
+no semicolon
+too;many;semicolons
+blank value;
+;blank key
+;2nd blank key
+
+normal;line
+file ends without semicolon
