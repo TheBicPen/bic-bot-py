@@ -13,7 +13,8 @@ def strip2(text: str, strip_text: str):
     """
     Returns a string with everything up to and including the first occurence
     of strip_text and 1 additional character stripped from text. 
-    If strip_text is not in text, return text[-1]
+    If strip_text is not in text, strip the length of strip_text + 1 chars from
+    text and return the rest.
     """
     index = text.find(strip_text) + len(strip_text) + 1 # accounts for the space
     return text[index:]
@@ -24,7 +25,7 @@ def make_directory(dir):
 
 def read_file(file:str) -> list:
     """
-    Returns the contents of the file. If the file does not exist, creates the file
+    Returns the lines of a utf-8 formatted file. If the file does not exist, creates the file
     and returns an empty list.
     #precondition: the directory exists. the file name is valid.
     """
@@ -41,6 +42,9 @@ def read_file(file:str) -> list:
     return contents
 
 def write_file(file:str, contents:str):
+    """
+    Checks that the file exists, then writes contents to it
+    """
     read_file(file)
     file_IO = open(file, "w")
     file_IO.write(contents)
@@ -99,6 +103,17 @@ def convert_string(text:str, conversion:int):
         text = text.casefold()
     return text
 
+def check_admin(message):
+    """
+    Returns true only is the message sender is the owner of the server.
+    Returns false if an error occurs or if the sender is not the server owner
+    """
+    if message is None:
+        return 0
+    try:
+        return message.guild.owner == message.author
+    except:
+        return 0
 
 #logging
 
