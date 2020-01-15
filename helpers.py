@@ -115,6 +115,41 @@ def check_admin(message):
     except:
         return 0
 
+def get_user_property(server: str, user: str, prop: str, help=False):
+    user_to_property = read_dict_from_file(
+        "servers/{1}/user_data/{0}".format(user, server), {})
+    return user_to_property.get(prop)
+
+
+def set_user_property(server: str, user: str, prop: str, val, help=False):
+    user_to_property = read_dict_from_file(
+        "servers/{1}/user_data/{0}".format(user, server))
+    user_to_property.update({prop: val})
+    write_dict_to_file(
+        user_to_property, "servers/{1}/user_data/{0}".format(user, server))
+
+
+def delete_user(server: str, user_mentions: str, help=False):
+    out = ""
+    for user in user_mentions:
+        try:
+            os.remove("servers/{1}/user_data/{0}".format(user, server))
+            out += "Deleted {0}'s info.\n".format(user)
+        except:
+            out += "Failed to delete.\n"
+    return out
+
+
+def get_generic_dict(d: dict, d_name, key, help=False):
+    d = read_dict_from_file("global_dicts/{0}".format(d_name), {})
+    return d.get(key)
+
+
+def set_generic_dict(d: dict, d_name, key, val, help=False):
+    get_generic_dict(d, d_name, key)
+    d.update({key: val})
+    write_dict_to_file(d, "global_dicts/{0}".format(d_name))
+
 
 def func_doc(func):
     """
