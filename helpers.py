@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 
-#helper functions
+# helper functions
 # def strip1(text: str, strip_text: str): #useless wtf
 #     """
 #     Returns a string with strip_text stripped from the beginning of text.
@@ -16,14 +16,17 @@ def strip2(text: str, strip_text: str):
     If strip_text is not in text, strip the length of strip_text + 1 chars from
     text and return the rest.
     """
-    index = text.find(strip_text) + len(strip_text) + 1 # accounts for the space
+    index = text.find(strip_text) + len(strip_text) + \
+        1  # accounts for the space
     return text[index:]
+
 
 def make_directory(dir):
     if not os.path.exists(dir) and dir != '':
         os.makedirs(dir)
 
-def read_file(file:str) -> list:
+
+def read_file(file: str) -> list:
     """
     Returns the lines of a utf-8 formatted file. If the file does not exist, creates the file
     and returns an empty list.
@@ -41,7 +44,8 @@ def read_file(file:str) -> list:
         file_IO.close()
     return contents
 
-def write_file(file:str, contents:str):
+
+def write_file(file: str, contents: str):
     """
     Checks that the file exists, then writes contents to it
     """
@@ -51,7 +55,7 @@ def write_file(file:str, contents:str):
     file_IO.close
 
 
-def read_dict_from_file(file:str, d={}):
+def read_dict_from_file(file: str, d={}):
     """
     Reads a file where each line has 2 words separated 
     by a space, and appends these words to dict as key-value
@@ -64,10 +68,10 @@ def read_dict_from_file(file:str, d={}):
         if num_semicolons == 0:
             print("line in file formatted improperly\n")
             return d
-        elif num_semicolons == 1: #no semicolons in text
+        elif num_semicolons == 1:  # no semicolons in text
             words = line.split(";")
             d.update({words[0]: words[1]})
-        else: # semicolons in text
+        else:  # semicolons in text
             for ch_index in range(len(line)):
                 if line[ch_index] == ";" and line[ch_index-1: ch_index] != "\\":
                     split_index = ch_index
@@ -75,10 +79,11 @@ def read_dict_from_file(file:str, d={}):
             words[0] = words[0].replace("\\", "")
             words[1] = words[1].replace("\\", "")
             d.update({words[0]: words[1]})
-            
+
     return d
 
-def write_dict_to_file(d:dict, fl:str):
+
+def write_dict_to_file(d: dict, fl: str):
     """
     Writes the key-value pairs in d as space-separated words
     in file. Each pair is on its own line.
@@ -93,15 +98,17 @@ def write_dict_to_file(d:dict, fl:str):
 # def get_trans(fl:str, d:dict):
 #     if d != {}:
 
-def convert_string(text:str, conversion:int):
+
+def convert_string(text: str, conversion: int):
     # convert to desired format
-    if conversion == 1: # to upper
+    if conversion == 1:  # to upper
         text = text.upper()
-    elif conversion == 2: # to lower
+    elif conversion == 2:  # to lower
         text = text.lower()
-    elif text == 3: # aggressively to lower
+    elif text == 3:  # aggressively to lower
         text = text.casefold()
     return text
+
 
 def check_admin(message):
     """
@@ -114,6 +121,7 @@ def check_admin(message):
         return message.guild.owner == message.author
     except:
         return 0
+
 
 def get_user_property(server: str, user: str, prop: str, help=False):
     user_to_property = read_dict_from_file(
@@ -151,28 +159,31 @@ def set_generic_dict(d: dict, d_name, key, val, help=False):
     write_dict_to_file(d, "global_dicts/{0}".format(d_name))
 
 
-def func_doc(func):
+def func_doc(funcs, func):
     """
     Returns the docstring for a function by name
     """
+    if funcs is not None:
+        return funcs[func].__doc__
     return globals()[func].__doc__
 
-#logging
+# logging
+
 
 def init_log():
-    file_name = "logs/"+ datetime.now().strftime("%Y%m%d-%H%M%S") + ".txt"
+    file_name = "logs/" + datetime.now().strftime("%Y%m%d-%H%M%S") + ".txt"
     read_file(file_name)
     log_file = open(file_name, "a+", encoding='utf8')
     log_file.write("Begin logging.\n")
     return log_file
 
 
-#idk what else to do here
+# idk what else to do here
 if __name__ != "__main__":
     log_file = init_log()
 
-def log(log_string:str):
+
+def log(log_string: str):
     log_file.write(str(log_string) + "\n")
     log_file.flush()
     print(log_string)
-

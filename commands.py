@@ -9,7 +9,6 @@ import consts
 from importlib import import_module
 
 
-
 class parser:
     settings = {}
     modules = {}
@@ -47,8 +46,8 @@ class parser:
                 # command list
 
                 if msg_list[0] == help_str:
-                    if len(msg_list > 1):
-                        return func_doc(msg_list[1])
+                    if len(msg_list) > 1:
+                        return func_doc(globals(), msg_list[1])
                     else:
                         return consts.cmd_list
 
@@ -68,7 +67,8 @@ class parser:
                 elif msg_list[0] == "nut":
                     return self.modules["commands_generic"].list_response(read_file("global_lists/nut.txt"))
                 elif msg_list[0] == "extrathicc":
-                    thicc_dict = read_dict_from_file("global_dicts/extrathicc.txt")
+                    thicc_dict = read_dict_from_file(
+                        "global_dicts/extrathicc.txt")
                     return self.modules["commands_generic"].translate(message, "extrathicc", thicc_dict, self, help=cmd_help)
                 elif msg_list[0] == "leet":
                     leet_dict = read_dict_from_file("global_dicts/leet.txt")

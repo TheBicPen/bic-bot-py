@@ -1,7 +1,7 @@
 # Work with Python 3.6
 import discord
 import commands
-from helpers_generic import log, init_log
+from helpers import log, init_log
 import consts
 from sys import argv
 #import log
