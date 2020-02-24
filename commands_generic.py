@@ -119,7 +119,7 @@ def set_name(message, user_list, trigger_string, parser, help=False):
     return out
 
 
-def get_name(message, parser, user_list, help=False):
+def get_name(message, user_list, parser, help=False):
     """
     Sets a user's nickname - not to be confused with the discord nickname
     """
