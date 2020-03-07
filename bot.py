@@ -1,7 +1,7 @@
 # Work with Python 3.6
 import discord
-import commands
-from helpers import log, init_log
+import message_parser as parser
+import helpers
 import consts
 from sys import argv
 #import log
@@ -10,24 +10,24 @@ from sys import argv
 # initialize
 # default settings
 
-TOKEN = commands.read_file("credentials/discord_token.txt")
+TOKEN = helpers.read_file("credentials/discord_token.txt")
 if len(TOKEN) > 0:
     TOKEN = TOKEN[0]
 else:
-    log("Unable to read Discord token")
+    helpers.log("Unable to read Discord token")
 
 
-settings = commands.read_dict_from_file("settings.txt", consts.default_settings)
-explicit_responses = commands.read_dict_from_file(
+settings = helpers.read_dict_from_file("settings.txt", consts.default_settings)
+explicit_responses = helpers.read_dict_from_file(
     "global_dicts/explicit_responses")
-pattern_responses = commands.read_dict_from_file(
+pattern_responses = helpers.read_dict_from_file(
     "global_dicts/pattern_responses")
-modules = {"commands_generic"}
+modules = ["generic_module.commands"]
 
 # parse arguments
 if "--tf" in argv:
     modules.add(consts.ML_lib)
-parser = commands.parser(
+message_parser = parser.Parser(
     settings, modules, explicit_responses, pattern_responses)
 client = discord.Client()
 
@@ -51,7 +51,7 @@ async def on_message(message):
             message, settings["command_str"])
 
     else:
-        msg = await parser.parse_message(message)
+        msg = await message_parser.parse_message(message)
 
     # if not msg is None:
     #     try:
@@ -72,21 +72,21 @@ async def on_message(message):
     if not msg is None:
         try:
             if len(str(msg)) > 2000:
-                log("message too long: " + str(len(str(msg))))
+                helpers.log("message too long: " + str(len(str(msg))))
                 await message.channel.send("message too long: " + str(len(str(msg))))
             elif len(str(msg)) > 0:
                 await message.channel.send(msg)
         except:
-            log("Failed to process message of type " + str(type(msg)))
+            helpers.log("Failed to process message of type " + str(type(msg)))
 
 
 @client.event
 async def on_ready():
-    log('Logged in as')
-    log(client.user.name)
-    log(client.user.id)
-    log('------')
+    helpers.log('Logged in as')
+    helpers.log(client.user.name)
+    helpers.log(client.user.id)
+    helpers.log('------')
 if type(TOKEN) == type(""):
     client.run(TOKEN)
 else:
-    log("Invalid token type: " + str(type(TOKEN)))
+    helpers.log("Invalid token type: " + str(type(TOKEN)))

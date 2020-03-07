@@ -1,4 +1,4 @@
-from commands_generic import *  # forgive me
+# from generic_module.commands_generic import *  # forgive me
 import helpers
 import os
 import urllib.request
@@ -9,7 +9,7 @@ import consts
 from importlib import import_module
 
 
-class parser:
+class Parser:
     settings = {}
     modules = {}
     explicit_responses = {}
@@ -47,7 +47,7 @@ class parser:
 
                 if msg_list[0] == help_str:
                     if len(msg_list) > 1:
-                        return func_doc(globals(), msg_list[1])
+                        return helpers.func_doc(globals(), msg_list[1])
                     else:
                         return consts.cmd_list
 
@@ -63,18 +63,18 @@ class parser:
                 elif msg_list[0] == "hello":
                     return self.modules["commands_generic"].hello(message, help=cmd_help)
                 elif msg_list[0] == "commit":
-                    return self.modules["commands_generic"].list_response(read_file("global_lists/commit.txt"))
+                    return self.modules["commands_generic"].list_response(helpers.read_file("global_lists/commit.txt"))
                 elif msg_list[0] == "nut":
-                    return self.modules["commands_generic"].list_response(read_file("global_lists/nut.txt"))
+                    return self.modules["commands_generic"].list_response(helpers.read_file("global_lists/nut.txt"))
                 elif msg_list[0] == "extrathicc":
-                    thicc_dict = read_dict_from_file(
+                    thicc_dict = helpers.read_dict_from_file(
                         "global_dicts/extrathicc.txt")
                     return self.modules["commands_generic"].translate(message, "extrathicc", thicc_dict, self, help=cmd_help)
                 elif msg_list[0] == "leet":
-                    leet_dict = read_dict_from_file("global_dicts/leet.txt")
+                    leet_dict = helpers.read_dict_from_file("global_dicts/leet.txt")
                     return self.modules["commands_generic"].translate(message, "leet", leet_dict, self, help=cmd_help)
                 elif msg_list[0] == "keeb":
-                    return self.modules["commands_generic"].keeb(message, read_file("global_dicts/korean.txt"))
+                    return self.modules["commands_generic"].keeb(message, helpers.read_file("global_dicts/korean.txt"))
                 elif msg_list[0] == "callme":
                     return self.modules["commands_generic"].set_name(message, [message.author], "callme", self, help=cmd_help)
                 elif msg_list[0] == "myname":
@@ -84,7 +84,7 @@ class parser:
                 elif msg_list[0] == "name":
                     return self.modules["commands_generic"].get_name(message, message.mentions, self, help=cmd_help)
                 elif msg_list[0] == "deleteuser":
-                    return delete_user(message.guild, message.mentions, help=cmd_help)
+                    return helpers.delete_user(message.guild, message.mentions, help=cmd_help)
                 elif msg_list[0] == "defexplicit":
                     return self.modules["commands_generic"].define(message, self.explicit_responses, "explicit_responses", help=cmd_help)
                 elif msg_list[0] == "defpattern":
@@ -114,13 +114,13 @@ class parser:
                 elif msg_list[0] == "eval":
                     if message.author == message.guild.owner:
                         # evaluate the message only if the message author is the owner
-                        return eval(strip2(message.content, "eval"))
+                        return eval(helpers.strip2(message.content, "eval"))
                     else:
                         return "Insufficient permissions. Must be server owner."
                 elif msg_list[0] == "exec":
                     if message.author == message.guild.owner:
                         # evaluate the message only if the message author is the owner
-                        exec(strip2(message.content, "exec"))
+                        exec(helpers.strip2(message.content, "exec"))
                         return  # exec doesn't return anything, so we return to not send an empty message
                     else:
                         return "Insufficient permissions. Must be server owner."
