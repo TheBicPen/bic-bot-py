@@ -26,7 +26,7 @@ modules = ["generic_module.commands"]
 
 # parse arguments
 if "--tf" in argv:
-    modules.add(consts.ML_lib)
+    modules.append(consts.ML_lib)
 message_parser = parser.Parser(
     settings, modules, explicit_responses, pattern_responses)
 client = discord.Client()

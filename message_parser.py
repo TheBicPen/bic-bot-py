@@ -51,44 +51,7 @@ class Parser:
                     else:
                         return consts.cmd_list
 
-                elif msg_list[0] == "isbot":
-                    return self.modules["commands_generic"].isbot(message, help=cmd_help)
-                elif msg_list[0] == "ping":
-                    return self.modules["commands_generic"].ping(message, help=cmd_help)
-                elif msg_list[0] == "version":
-                    return self.modules["commands_generic"].version(help=cmd_help)
-                elif msg_list[0] == "settings":
-                    # (settings) <- no longer necessary
-                    return self.modules["commands_generic"].settings
-                elif msg_list[0] == "hello":
-                    return self.modules["commands_generic"].hello(message, help=cmd_help)
-                elif msg_list[0] == "commit":
-                    return self.modules["commands_generic"].list_response(helpers.read_file("global_lists/commit.txt"))
-                elif msg_list[0] == "nut":
-                    return self.modules["commands_generic"].list_response(helpers.read_file("global_lists/nut.txt"))
-                elif msg_list[0] == "extrathicc":
-                    thicc_dict = helpers.read_dict_from_file(
-                        "global_dicts/extrathicc.txt")
-                    return self.modules["commands_generic"].translate(message, "extrathicc", thicc_dict, self, help=cmd_help)
-                elif msg_list[0] == "leet":
-                    leet_dict = helpers.read_dict_from_file("global_dicts/leet.txt")
-                    return self.modules["commands_generic"].translate(message, "leet", leet_dict, self, help=cmd_help)
-                elif msg_list[0] == "keeb":
-                    return self.modules["commands_generic"].keeb(message, helpers.read_file("global_dicts/korean.txt"))
-                elif msg_list[0] == "callme":
-                    return self.modules["commands_generic"].set_name(message, [message.author], "callme", self, help=cmd_help)
-                elif msg_list[0] == "myname":
-                    return self.modules["commands_generic"].get_name(message, [message.author], self, help=cmd_help)
-                elif msg_list[0] == "call":
-                    return self.modules["commands_generic"].set_name(message, message.mentions, "call", self, help=cmd_help)
-                elif msg_list[0] == "name":
-                    return self.modules["commands_generic"].get_name(message, message.mentions, self, help=cmd_help)
-                elif msg_list[0] == "deleteuser":
-                    return helpers.delete_user(message.guild, message.mentions, help=cmd_help)
-                elif msg_list[0] == "defexplicit":
-                    return self.modules["commands_generic"].define(message, self.explicit_responses, "explicit_responses", help=cmd_help)
-                elif msg_list[0] == "defpattern":
-                    return self.modules["commands_generic"].define(message, self.pattern_responses, "pattern_responses", help=cmd_help)
+                elif 
 
                 # image classification
                 elif msg_list[0] == "imagecat":

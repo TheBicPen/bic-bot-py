@@ -1,6 +1,6 @@
 
 
-from helpers import *  # forgive me
+from ..helpers import *
 
 # no params, simple text
 
@@ -29,12 +29,11 @@ def version(help=False):
     """
     return "uh I don't really do that at this point"
 
-# def get_settings(setting_to_val):
-#     """
-#     returns the value passed as an argument. Intended to be used to return the
-#     dict containing the settings.
-#     """
-#     return setting_to_val
+def settings(setting_to_val):
+    """
+    Does nothing for now
+    """
+    return ""
 
 # params: message only
 
@@ -78,7 +77,7 @@ def keeb(message, korean_list: list, help=False):
 
 def translate(message: str, key: str, trans_dict: dict, parser, convert_text=1, help=False):
     """
-    Translats your message using the provided dictionary
+    Translates your message using the provided dictionary
     """
     if trans_dict == {}:
         read_dict_from_file("global_dicts/{0}.txt".format(key), trans_dict)
@@ -121,7 +120,7 @@ def set_name(message, user_list, trigger_string, parser, help=False):
 
 def get_name(message, user_list, parser, help=False):
     """
-    Sets a user's nickname - not to be confused with the discord nickname
+    Gets a user's nickname - not to be confused with the discord nickname
     """
     if parser.settings.get("annoyed_everyone", True) and message.mention_everyone:
         return parser.settings.get("everyone_string", "no u")
