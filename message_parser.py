@@ -14,6 +14,7 @@ class Parser:
     modules = {}
     explicit_responses = {}
     pattern_responses = {}
+    commands = {}
 
     def __init__(self, settings: dict, modules: list, explicit_responses: dict, pattern_responses: dict):
         self.settings = settings
@@ -22,6 +23,7 @@ class Parser:
         for module in modules:
             try:
                 self.modules[module] = import_module(module)
+                self.commands.update({str(func):func for func in dir(module)}) # the func name should be the command name
                 print("Imported module " + str(module))
             except Exception as e:
                 print("Failed to import module " + str(module))
@@ -51,7 +53,8 @@ class Parser:
                     else:
                         return consts.cmd_list
 
-                elif 
+                elif msg_list[0] in self.commands.keys():
+                    self.commands[msg_list[0]](message)
 
                 # image classification
                 elif msg_list[0] == "imagecat":
