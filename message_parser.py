@@ -8,6 +8,8 @@ import consts
 
 from importlib import import_module
 
+import generic_module.commands
+
 
 class Parser:
     settings = {}
@@ -22,13 +24,26 @@ class Parser:
         self.pattern_responses = pattern_responses
         for module in modules:
             try:
-                self.modules[module] = import_module(module)
-                self.commands.update({str(func):func for func in dir(module)}) # the func name should be the command name
+                self.modules[module] = import_module(module, '.')
+                # the func name should be the command name
+                self.commands.update({str(func): func for func in dir(module)})
                 print("Imported module " + str(module))
             except Exception as e:
                 print("Failed to import module " + str(module))
                 print(str(e))
                 return None
+
+    def add_module(self, module):
+        try:
+            self.modules[module] = import_module(module)
+            # the func name should be the command name
+            self.commands.update({str(func): func for func in dir(module)})
+            print("Imported module " + str(module))
+        except Exception as e:
+            print("Failed to import module " + str(module))
+            print(str(e))
+            return None
+
 
     async def parse_message(self, message):
         cmd_help = False
