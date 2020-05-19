@@ -7,24 +7,20 @@ from sys import argv
 #import log
 
 def main():
-    # initialize
-    # default settings
-
     TOKEN = helpers.read_file("credentials/discord_token.txt")
     if len(TOKEN) > 0:
         TOKEN = TOKEN[0]
     else:
         helpers.log("Unable to read Discord token")
 
-
-settings = helpers.read_dict_from_file("settings.txt", consts.default_settings)
-# explicit_responses = helpers.read_dict_from_file(
-#     "global_dicts/explicit_responses")
-# pattern_responses = helpers.read_dict_from_file(
-#     "global_dicts/pattern_responses")
-explicit_responses = None
-pattern_responses = None
-modules = ["generic_module"]
+    settings = helpers.read_dict_from_file("settings.txt", consts.default_settings)
+    # explicit_responses = helpers.read_dict_from_file(
+    #     "global_dicts/explicit_responses")
+    # pattern_responses = helpers.read_dict_from_file(
+    #     "global_dicts/pattern_responses")
+    explicit_responses = None
+    pattern_responses = None
+    modules = ["generic_module"]
 
     # parse arguments
     if "--tf" in argv:
@@ -32,14 +28,6 @@ modules = ["generic_module"]
     message_parser = parser.Parser(
         settings, modules, explicit_responses, pattern_responses)
     client = discord.Client()
-
-    #command_str = settings["command_str"]
-
-    #TOKEN = None
-    #settings = None
-    #client = None
-
-    # initialize()
 
 
 @client.event
@@ -55,22 +43,6 @@ async def on_message(message):
     else:
         msg = await message_parser.parse_message(message)
 
-    # if not msg is None:
-    #     try:
-    #         msg_len = getattr(msg,"__len__")
-    #         print(msg_len)
-    #         if msg_len == 0:
-    #             return
-
-    #         if len(msg) == 0:
-    #             print("msg: {0}\n".format(msg))
-    #             msg = "Unable to send empty message."
-    #         print("msg: {0}\n".format(msg))
-    #         await client.send_message(message.channel, msg)
-    #     except:
-    #         print("some kind of attribute error in the message or something")
-    # else:
-    #     print("null message")
     if not msg is None:
         try:
             if len(str(msg)) > 2000:
