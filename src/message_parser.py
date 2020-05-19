@@ -6,6 +6,7 @@ import aiohttp
 import asyncio
 import consts
 import re
+import traceback
 
 from importlib import import_module
 
@@ -30,7 +31,7 @@ class Parser:
 
     def add_module(self, module):
         try:
-            self.modules[module] = import_module(module, '.')
+            self.modules[module] = import_module(module, 'modules')
             module_items = self.modules[module].module()
             if not isinstance(module_items, BicBotModule):
                 error = f"Module {module} is of incorrect type {type(module)}"
@@ -52,7 +53,7 @@ class Parser:
                 print("Imported module " + str(module))
         except Exception as e:
             print("Failed to import module " + str(module))
-            print(str(e))
+            traceback.print_exc()
             return None
 
     async def parse_message(self, message):
@@ -139,7 +140,7 @@ class Parser:
             try:
                 response = self.explicit_responses[msg](message)
             except Exception as e:
-                print(e.with_traceback())
+                traceback.print_exc()
                 response = f"Module failed to handle message."
             else:
                 pass
@@ -155,7 +156,7 @@ class Parser:
             try:
                 response = self.pattern_responses[msg](message)
             except Exception as e:
-                print(e.with_traceback())
+                traceback.print_exc()
                 response = f"Module failed to handle regex-matched message."
             else:
                 pass
