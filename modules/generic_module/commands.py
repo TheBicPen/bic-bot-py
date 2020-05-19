@@ -1,6 +1,6 @@
 
 
-from ..helpers import *
+from src.helpers import *
 
 # no params, simple text
 
