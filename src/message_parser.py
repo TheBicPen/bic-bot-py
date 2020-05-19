@@ -11,6 +11,7 @@ from importlib import import_module
 
 # import generic_module.commands
 from module_class import BicBotModule
+from module_func import ModuleFunction
 
 
 class Parser:
@@ -38,16 +39,15 @@ class Parser:
             else:
                 # add command matches
                 for command in module_items.command_matches:
+                    module_function = ModuleFunction(module_items.command_matches[command], module_items.name)
                     if command not in self.commands:
-                        self.commands[command] = {
-                            "module": module_items.name, "function": module_items.command_matches[command]}
+                        self.commands[command] = module_function
                     else:
                         new_name = f"{module_items.name}.{command}"
                         existing_module = self.commands[command]["module"]
                         print(
                             f"Command {command} already loaded from module {existing_module}. Loading as {new_name} instead")
-                        self.commands[new_name] = {
-                            "module": module_items.name, "function": module_items.command_matches[command]}
+                        self.commands[new_name] = module_function
                 print("Imported module " + str(module))
         except Exception as e:
             print("Failed to import module " + str(module))
