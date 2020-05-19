@@ -1,5 +1,4 @@
 # from generic_module.commands_generic import *  # forgive me
-import helpers
 import os
 import urllib.request
 import aiohttp
@@ -7,16 +6,18 @@ import asyncio
 import consts
 import re
 import traceback
+import collections
+from importlib import import_module
 
 # import sys
 # print(sys.path)
 # from modules import generic_module
 
-from importlib import import_module
 
 # import generic_module.commands
 from module_class import BicBotModule
 from module_func import ModuleFunction
+import helpers
 
 
 class Parser:
@@ -27,9 +28,12 @@ class Parser:
     commands = {}
 
     def __init__(self, settings: dict, modules: list, explicit_responses: dict, pattern_responses: dict):
-        self.settings = settings
-        self.explicit_responses = explicit_responses
-        self.pattern_responses = pattern_responses
+        if isinstance(settings, collections.Iterable):
+            self.settings.update(settings)
+        if isinstance(explicit_responses, collections.Iterable):
+            self.explicit_responses.update(explicit_responses)
+        if isinstance(pattern_responses, collections.Iterable):
+            self.pattern_responses.update(pattern_responses)
         for module in modules:
             self.add_module(module)
 
