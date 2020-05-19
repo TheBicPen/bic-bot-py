@@ -1,19 +1,24 @@
 
 # a class for new modules to make instances of
 
+default_help_string = "This is what a module sould look like. If you are seeing this, then the module info has not been set properly"
 
-class Bic_bot_command_module:
-    triggers = []
-    functions = []
-    function_help_docs = []
-    module_help_string = "This is what a module sould look like. If you are seeing this, then the help info has not been set properly"
 
-    def __init__(self, module_help_string):
-        super().__init__()
-        if module_help_string is not None:
-            self.module_help_string = module_help_string
+class BicBotModule:
 
-    def add_func(self, trigger, function, help_string):
-        self.triggers.append(trigger)
-        self.functions.append(function)
-        self.function_help_docs.append(help_string)
+    name = ""
+    help_string = ""
+
+    # triggers for functions
+    literal_matches = {}  # message contains literal string
+    regex_matches = {}  # message matches regex
+    command_matches = {}  # bot commands
+
+    def __init__(self, name: str = "Module", module_help_string: str = default_help_string,
+                 literal_matches: dict = {}, regex_matches: dict = {}, command_matches: dict = {}):
+
+        self.module_help_string = module_help_string
+        self.name = name # name is used as an additional command keyword in case of command name conflicts
+        self.literal_matches = literal_matches
+        self.regex_matches = regex_matches
+        self.command_matches = command_matches
