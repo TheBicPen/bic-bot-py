@@ -88,7 +88,7 @@ class Parser:
                         return consts.cmd_list
 
                 elif msg_list[0] in self.commands.keys():
-                    self.commands[msg_list[0]](message)
+                    return self.commands[msg_list[0]].function(message)
 
                 # # image classification
                 # elif msg_list[0] == "imagecat":
@@ -161,16 +161,16 @@ class Parser:
             for pattern in self.pattern_responses:
                 if pattern.match(message):
                     response = ""
-            try:
-                response = self.pattern_responses[msg](message)
-            except Exception as e:
-                traceback.print_exc()
-                response = f"Module failed to handle regex-matched message."
-            else:
-                pass
-            finally:
-                pass
-            return response
+                    try:
+                        response = self.pattern_responses[msg](message)
+                    except Exception as e:
+                        traceback.print_exc()
+                        response = f"Module failed to handle regex-matched message."
+                    else:
+                        pass
+                    finally:
+                        pass
+                    return response
         # classify image if applicable
         # elif consts.ML_lib in self.modules and tf_sess is not None and len(message.attachments) > 0:
         #     return await self.modules[consts.ML_lib].image_appropriate(message, tf_sess, classifications)
