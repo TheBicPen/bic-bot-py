@@ -8,6 +8,10 @@ import consts
 import re
 import traceback
 
+# import sys
+# print(sys.path)
+# from modules import generic_module
+
 from importlib import import_module
 
 # import generic_module.commands
@@ -31,7 +35,7 @@ class Parser:
 
     def add_module(self, module):
         try:
-            self.modules[module] = import_module(module, 'modules')
+            self.modules[module] = import_module(f"modules.{module}.module")
             module_items = self.modules[module].module()
             if not isinstance(module_items, BicBotModule):
                 error = f"Module {module} is of incorrect type {type(module)}"

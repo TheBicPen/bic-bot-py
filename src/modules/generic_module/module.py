@@ -1,6 +1,6 @@
 
-from src import module_class
-import adapter
+import module_class
+from . import adapter
 
 
 def module():

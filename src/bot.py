@@ -22,7 +22,7 @@ explicit_responses = helpers.read_dict_from_file(
     "global_dicts/explicit_responses")
 pattern_responses = helpers.read_dict_from_file(
     "global_dicts/pattern_responses")
-modules = ["generic_module.commands"]
+modules = ["generic_module"]
 
 # parse arguments
 if "--tf" in argv:

@@ -1,5 +1,5 @@
-import commands as generic_module
-from src import helpers
+from . import commands as generic_module
+import helpers
 
 
 # the function docstrings get returned when the user uses the help function
