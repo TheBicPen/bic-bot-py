@@ -17,12 +17,14 @@ def main():
         helpers.log("Unable to read Discord token")
 
 
-    settings = helpers.read_dict_from_file("settings.txt", consts.default_settings)
-    explicit_responses = helpers.read_dict_from_file(
-        "global_dicts/explicit_responses")
-    pattern_responses = helpers.read_dict_from_file(
-        "global_dicts/pattern_responses")
-    modules = ["generic_module.commands"]
+settings = helpers.read_dict_from_file("settings.txt", consts.default_settings)
+# explicit_responses = helpers.read_dict_from_file(
+#     "global_dicts/explicit_responses")
+# pattern_responses = helpers.read_dict_from_file(
+#     "global_dicts/pattern_responses")
+explicit_responses = None
+pattern_responses = None
+modules = ["generic_module"]
 
     # parse arguments
     if "--tf" in argv:

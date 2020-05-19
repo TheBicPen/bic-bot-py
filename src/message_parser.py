@@ -1,20 +1,22 @@
 # from generic_module.commands_generic import *  # forgive me
-from . import helpers
-from . import consts
 import os
 import urllib.request
 import aiohttp
 import asyncio
 import re
 import traceback
-import sys
-print(sys.path)
-
+import collections
 from importlib import import_module
 
+# import sys
+# print(sys.path)
+# from modules import generic_module
+
+
 # import generic_module.commands
-from .module_class import BicBotModule
-from .module_func import ModuleFunction
+from module_class import BicBotModule
+from module_func import ModuleFunction
+import helpers
 
 
 class Parser:
@@ -25,15 +27,18 @@ class Parser:
     commands = {}
 
     def __init__(self, settings: dict, modules: list, explicit_responses: dict, pattern_responses: dict):
-        self.settings = settings
-        self.explicit_responses = explicit_responses
-        self.pattern_responses = pattern_responses
+        if isinstance(settings, collections.Iterable):
+            self.settings.update(settings)
+        if isinstance(explicit_responses, collections.Iterable):
+            self.explicit_responses.update(explicit_responses)
+        if isinstance(pattern_responses, collections.Iterable):
+            self.pattern_responses.update(pattern_responses)
         for module in modules:
             self.add_module(module)
 
     def add_module(self, module):
         try:
-            self.modules[module] = import_module(module + ".module", '../modules')
+            self.modules[module] = import_module(f"modules.{module}.module")
             module_items = self.modules[module].module()
             if not isinstance(module_items, BicBotModule):
                 error = f"Module {module} is of incorrect type {type(module)}"
@@ -82,7 +87,7 @@ class Parser:
                         return consts.cmd_list
 
                 elif msg_list[0] in self.commands.keys():
-                    self.commands[msg_list[0]](message)
+                    return self.commands[msg_list[0]].function(message)
 
                 # # image classification
                 # elif msg_list[0] == "imagecat":
@@ -155,16 +160,16 @@ class Parser:
             for pattern in self.pattern_responses:
                 if pattern.match(message):
                     response = ""
-            try:
-                response = self.pattern_responses[msg](message)
-            except Exception as e:
-                traceback.print_exc()
-                response = f"Module failed to handle regex-matched message."
-            else:
-                pass
-            finally:
-                pass
-            return response
+                    try:
+                        response = self.pattern_responses[msg](message)
+                    except Exception as e:
+                        traceback.print_exc()
+                        response = f"Module failed to handle regex-matched message."
+                    else:
+                        pass
+                    finally:
+                        pass
+                    return response
         # classify image if applicable
         # elif consts.ML_lib in self.modules and tf_sess is not None and len(message.attachments) > 0:
         #     return await self.modules[consts.ML_lib].image_appropriate(message, tf_sess, classifications)
