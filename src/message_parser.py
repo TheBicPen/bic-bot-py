@@ -32,14 +32,15 @@ class Parser:
         try:
             self.modules[module] = import_module(module, '.')
             module_items = self.modules[module].module()
-            if type(module_items) != "BicBotModule":
+            if not isinstance(module_items, BicBotModule):
                 error = f"Module {module} is of incorrect type {type(module)}"
                 print(error)
                 raise ImportError(error)
             else:
                 # add command matches
                 for command in module_items.command_matches:
-                    module_function = ModuleFunction(module_items.command_matches[command], module_items.name)
+                    module_function = ModuleFunction(
+                        module_items.command_matches[command], module_items.name)
                     if command not in self.commands:
                         self.commands[command] = module_function
                     else:
@@ -131,7 +132,7 @@ class Parser:
                         return "Insufficient permissions. Must be server owner."
                 else:
                     return "invalid command"
-        
+
         # check for explicit responses
         elif msg in self.explicit_responses:
             response = ""
@@ -145,7 +146,7 @@ class Parser:
             finally:
                 pass
             return response
-        
+
         # match regexes
         else:
             for pattern in self.pattern_responses:
