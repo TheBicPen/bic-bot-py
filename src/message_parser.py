@@ -1,18 +1,20 @@
 # from generic_module.commands_generic import *  # forgive me
-import helpers
+from . import helpers
+from . import consts
 import os
 import urllib.request
 import aiohttp
 import asyncio
-import consts
 import re
 import traceback
+import sys
+print(sys.path)
 
 from importlib import import_module
 
 # import generic_module.commands
-from module_class import BicBotModule
-from module_func import ModuleFunction
+from .module_class import BicBotModule
+from .module_func import ModuleFunction
 
 
 class Parser:
@@ -31,7 +33,7 @@ class Parser:
 
     def add_module(self, module):
         try:
-            self.modules[module] = import_module(module, 'modules')
+            self.modules[module] = import_module(module + ".module", '../modules')
             module_items = self.modules[module].module()
             if not isinstance(module_items, BicBotModule):
                 error = f"Module {module} is of incorrect type {type(module)}"

@@ -1,43 +1,43 @@
 # Work with Python 3.6
 import discord
-import message_parser as parser
-import helpers
-import consts
+from . import message_parser as parser
+from . import helpers
+from . import consts
 from sys import argv
 #import log
 
+def main():
+    # initialize
+    # default settings
 
-# initialize
-# default settings
-
-TOKEN = helpers.read_file("credentials/discord_token.txt")
-if len(TOKEN) > 0:
-    TOKEN = TOKEN[0]
-else:
-    helpers.log("Unable to read Discord token")
+    TOKEN = helpers.read_file("credentials/discord_token.txt")
+    if len(TOKEN) > 0:
+        TOKEN = TOKEN[0]
+    else:
+        helpers.log("Unable to read Discord token")
 
 
-settings = helpers.read_dict_from_file("settings.txt", consts.default_settings)
-explicit_responses = helpers.read_dict_from_file(
-    "global_dicts/explicit_responses")
-pattern_responses = helpers.read_dict_from_file(
-    "global_dicts/pattern_responses")
-modules = ["generic_module.commands"]
+    settings = helpers.read_dict_from_file("settings.txt", consts.default_settings)
+    explicit_responses = helpers.read_dict_from_file(
+        "global_dicts/explicit_responses")
+    pattern_responses = helpers.read_dict_from_file(
+        "global_dicts/pattern_responses")
+    modules = ["generic_module.commands"]
 
-# parse arguments
-if "--tf" in argv:
-    modules.append(consts.ML_lib)
-message_parser = parser.Parser(
-    settings, modules, explicit_responses, pattern_responses)
-client = discord.Client()
+    # parse arguments
+    if "--tf" in argv:
+        modules.append(consts.ML_lib)
+    message_parser = parser.Parser(
+        settings, modules, explicit_responses, pattern_responses)
+    client = discord.Client()
 
-#command_str = settings["command_str"]
+    #command_str = settings["command_str"]
 
-#TOKEN = None
-#settings = None
-#client = None
+    #TOKEN = None
+    #settings = None
+    #client = None
 
-# initialize()
+    # initialize()
 
 
 @client.event
@@ -90,3 +90,7 @@ if type(TOKEN) == type(""):
     client.run(TOKEN)
 else:
     helpers.log("Invalid token type: " + str(type(TOKEN)))
+
+
+if __name__ == "__main__":
+    main()
