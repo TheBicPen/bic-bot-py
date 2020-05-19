@@ -8,7 +8,8 @@ import consts
 
 from importlib import import_module
 
-import generic_module.commands
+# import generic_module.commands
+from module_class import BicBotModule
 
 
 class Parser:
@@ -25,9 +26,21 @@ class Parser:
         for module in modules:
             try:
                 self.modules[module] = import_module(module, '.')
-                # the func name should be the command name
-                self.commands.update({str(func): func for func in dir(module)})
-                print("Imported module " + str(module))
+                module_items = self.modules[module].module()
+                if type(module_items) != "BicBotModule":
+                    error = f"Module {module} is of incorrect type {type(module)}"
+                    print(error)
+                    raise ImportError(error)
+                else:
+                    for command in module_items.command_matches:
+                        if command not in self.commands:
+                            self.commands[command] = {"module": module_items.name, "function": module_items.command_matches[command]}
+                        else:
+                            new_name = f"{module_items.name}.{command}"
+                            existing_module = self.commands[command]["module"]
+                            print(f"Command {command} already loaded from module {existing_module}. Loading as {new_name} instead")
+                            self.commands[new_name] = {"module": module_items.name, "function": module_items.command_matches[command]}
+                    print("Imported module " + str(module))
             except Exception as e:
                 print("Failed to import module " + str(module))
                 print(str(e))
@@ -71,25 +84,25 @@ class Parser:
                 elif msg_list[0] in self.commands.keys():
                     self.commands[msg_list[0]](message)
 
-                # image classification
-                elif msg_list[0] == "imagecat":
-                    if consts.ML_lib not in self.modules:
-                        return "Image classification module inactive"
-                    else:
-                        return await self.modules[consts.ML_lib].image_category(message, tf_sess, classifications, help=cmd_help)
-                elif msg_list[0] == "tfstop":
-                    if consts.ML_lib not in self.modules:
-                        return "Image classification module inactive"
-                    else:
-                        return self.modules[consts.ML_lib].stop_tf(help=cmd_help)
-                # admin-only
-                elif msg_list[0] == "tfstart":
-                    if message.author != message.guild.owner:
-                        return "Insufficient permissions. Must be server owner."
-                    elif consts.ML_lib not in self.modules:
-                        return "Image classification module inactive"
-                    else:
-                        return self.modules[consts.ML_lib].start_tf(help=cmd_help)
+                # # image classification
+                # elif msg_list[0] == "imagecat":
+                #     if consts.ML_lib not in self.modules:
+                #         return "Image classification module inactive"
+                #     else:
+                #         return await self.modules[consts.ML_lib].image_category(message, tf_sess, classifications, help=cmd_help)
+                # elif msg_list[0] == "tfstop":
+                #     if consts.ML_lib not in self.modules:
+                #         return "Image classification module inactive"
+                #     else:
+                #         return self.modules[consts.ML_lib].stop_tf(help=cmd_help)
+                # # admin-only
+                # elif msg_list[0] == "tfstart":
+                #     if message.author != message.guild.owner:
+                #         return "Insufficient permissions. Must be server owner."
+                #     elif consts.ML_lib not in self.modules:
+                #         return "Image classification module inactive"
+                #     else:
+                #         return self.modules[consts.ML_lib].start_tf(help=cmd_help)
 
                 # static debug/admin commands
                 elif msg_list[0] == "eval":
@@ -124,9 +137,19 @@ class Parser:
                     return "invalid command"
         # check for explicit responses
         elif msg in self.explicit_responses:
-            return self.explicit_responses[msg]
+            response = ""
+            try:
+                response = self.explicit_responses[msg](message)
+            except Exception as e:
+                print(e.with_traceback())
+                response = f"Module failed to handle message."
+            else:
+                pass
+            finally:
+                pass
+            return response
         # classify image if applicable
-        elif consts.ML_lib in self.modules and tf_sess is not None and len(message.attachments) > 0:
-            return await self.modules[consts.ML_lib].image_appropriate(message, tf_sess, classifications)
-        else:
-            return self.modules["commands_generic"].check_pattern(msg, self.pattern_responses, help=cmd_help)
+        # elif consts.ML_lib in self.modules and tf_sess is not None and len(message.attachments) > 0:
+        #     return await self.modules[consts.ML_lib].image_appropriate(message, tf_sess, classifications)
+        # else:
+        #     return self.modules["commands_generic"].check_pattern(msg, self.pattern_responses, help=cmd_help)
