@@ -11,5 +11,5 @@ class ModuleFunction:
         else:
             raise TypeError("Object passed in as function must be callable")
         self.module = module_name
-        self,help_string = help_string
+        self.help_string = help_string
 
