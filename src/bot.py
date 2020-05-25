@@ -3,6 +3,7 @@ import discord
 import message_parser as parser
 import helpers
 import consts
+from message_response import MessageResponse
 from sys import argv
 #import log
 
@@ -32,26 +33,18 @@ def main():
 
     @client.event
     async def on_message(message):
-        # we do not want the bot to reply to itself
+        # we do not want the bot to read its own messages
         if message.author == client.user:
             return
-
-        elif message.content.startswith("!debug"):
-            msg = 'Hello {0.author.mention}. The command string is {1}'.format(
-                message, settings["command_str"])
-
         else:
-            msg = await message_parser.parse_message(message)
-
-        if not msg is None:
             try:
-                if len(str(msg)) > 2000:
-                    helpers.log("message too long: " + str(len(str(msg))))
-                    await message.channel.send("message too long: " + str(len(str(msg))))
-                elif len(str(msg)) > 0:
+                msg = await message_parser.parse_message(message)
+                if msg and isinstance(msg, str):
                     await message.channel.send(msg)
-            except:
-                helpers.log("Failed to process message of type " + str(type(msg)))
+                elif msg and isinstance(msg, MessageResponse):
+                    message_parser.send_response(msg, message.channel)
+            except Exception as e:
+                print(e)
 
 
     @client.event

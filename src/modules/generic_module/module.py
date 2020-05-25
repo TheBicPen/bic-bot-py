@@ -7,8 +7,6 @@ def module():
 
     return module_class.BicBotModule(name="Base module",
                                      module_help_string="This is the base module. It contains commands for managing the bot, and demonstrating some of its functionality",
-                                     regex_matches=None,
-                                     literal_matches=None,
                                      command_matches={
                                          "isbot": adapter.isbot,
                                          "ping": adapter.ping,

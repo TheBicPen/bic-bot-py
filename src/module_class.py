@@ -13,12 +13,14 @@ class BicBotModule:
     literal_matches = {}  # message contains literal string
     regex_matches = {}  # message matches regex
     command_matches = {}  # bot commands
+    any_message = [] # handle all other messages. Minimize use of this, as each function here runs on every message sent
 
     def __init__(self, name: str = "Module", module_help_string: str = default_help_string,
-                 literal_matches: dict = {}, regex_matches: dict = {}, command_matches: dict = {}):
+                 literal_matches: dict = {}, regex_matches: dict = {}, command_matches: dict = {}, any_message = None):
 
         self.module_help_string = module_help_string
         self.name = name # name is used as an additional command keyword in case of command name conflicts
         self.literal_matches = literal_matches
         self.regex_matches = regex_matches
         self.command_matches = command_matches
+        self.any_message = any_message
