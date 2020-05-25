@@ -11,7 +11,7 @@ def module():
                                          "isbot": adapter.isbot,
                                          "ping": adapter.ping,
                                          "version": adapter.version,
-                                         "settings": adapter.settings,
+                                        #  "settings": adapter.settings,
                                          "hello": adapter.hello,
                                          "commit": adapter.commit,
                                          "nut": adapter.nut,

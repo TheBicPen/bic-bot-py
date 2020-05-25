@@ -14,7 +14,12 @@ def main():
     else:
         helpers.log("Unable to read Discord token")
 
-    settings = helpers.read_dict_from_file("settings.txt", consts.default_settings)
+    settings = helpers.read_dict_from_file("settings.txt", {})
+    if not settings:
+        print("Settings not found. Writing defaults to file.")
+        settings = helpers.read_dict_from_file("settings.txt", consts.default_settings)
+        helpers.write_dict_to_file(settings, "settings.txt")
+
     # explicit_responses = helpers.read_dict_from_file(
     #     "global_dicts/explicit_responses")
     # pattern_responses = helpers.read_dict_from_file(
@@ -39,10 +44,10 @@ def main():
         else:
             try:
                 msg = await message_parser.parse_message(message)
-                if msg and isinstance(msg, str):
+                if msg and isinstance(msg, MessageResponse):
+                    await message_parser.send_response(msg, message.channel)
+                elif msg:
                     await message.channel.send(msg)
-                elif msg and isinstance(msg, MessageResponse):
-                    message_parser.send_response(msg, message.channel)
             except Exception as e:
                 print(e)
 

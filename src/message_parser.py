@@ -89,9 +89,29 @@ class Parser:
             msg_list = msg.split()
             if len(msg_list) > 0:  # check for empty command string
                 # command list
-                content = self.parse_builtins(msg_list, message)
-                if content:
-                    return content
+                try:
+                    content = self.parse_builtins(msg_list, message)
+                    if content:
+                        return content
+                except Exception as e:
+                    return "Failed to execute builtin command: " + str(e)
+
+                if msg_list[0] in self.commands.keys():
+                    response = ""
+                    try:
+                        response = self.commands[msg_list[0]].function(message, settings=self.settings)
+                    except Exception as e:
+                        traceback.print_exc()
+                        response = f"Module failed to run command {msg_list[0]}."
+                    else:
+                        pass
+                    finally:
+                        pass
+                    return response
+                
+                else:
+                    help_str = self.settings.get("help_str", "help")
+                    return f"'{msg_list[0]}' is not a valid command. Try '{help_str}'"
 
         # check for explicit responses
         elif msg in self.literal_matches:
@@ -144,7 +164,7 @@ class Parser:
             content = message_response.message
         elif self.settings.get("send_debug", None) and len(message_response.message) + len(message_response.debug) < 2000:
             content = str(message_response.message) + \
-                          str(message_response.debug)
+                str(message_response.debug)
         if not content is None:
             try:
                 if len(str(content)) > 2000:
@@ -153,7 +173,6 @@ class Parser:
                 helpers.log(
                     "Failed to process message of type " + str(type(content)))
         await channel.send(content=content, tts=message_response.tts, embed=message_response.embed, file=file, files=files, delete_after=message_response.delete_after)
-
 
     def parse_builtins(self, msg_list, message):
         help_str = self.settings.get("help_str", "help")
@@ -166,34 +185,31 @@ class Parser:
         # static debug/admin commands
         elif msg_list[0] == "eval":
             if message.author == message.guild.owner:
-                # evaluate the message only if the message author is the owner
                 return eval(helpers.strip2(message.content, "eval"))
             else:
                 return "Insufficient permissions. Must be server owner."
+
         elif msg_list[0] == "exec":
             if message.author == message.guild.owner:
-                # evaluate the message only if the message author is the owner
                 exec(helpers.strip2(message.content, "exec"))
                 return  # exec doesn't return anything, so we return to not send an empty message
             else:
                 return "Insufficient permissions. Must be server owner."
+
         elif msg_list[0] == "ip":
             if message.author == message.guild.owner:
-                # evaluate the message only if the message author is the owner
                 with os.popen(consts.IP_command) as stream:
                     ip_string = stream.read()
                     return ip_string
             else:
                 return "Insufficient permissions. Must be server owner."
+
         elif msg_list[0] == "modules":
             if message.author == message.guild.owner:
-                # evaluate the message only if the message author is the owner
-                return self.modules
+                return "Modules: " + ", ".join(self.modules.keys())
             else:
                 return "Insufficient permissions. Must be server owner."
 
-        elif msg_list[0] in self.commands.keys():
-            return self.commands[msg_list[0]].function(message)
 
         # # image classification
         # elif msg_list[0] == "imagecat":

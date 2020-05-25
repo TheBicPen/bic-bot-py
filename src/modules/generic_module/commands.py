@@ -75,14 +75,14 @@ def keeb(message, korean_list: list, help=False):
 #params: message and global_lists
 
 
-def translate(message: str, key: str, trans_dict: dict, parser, convert_text=1, help=False):
+def translate(message: str, key: str, trans_dict: dict, settings, convert_text=1, help=False):
     """
     Translates your message using the provided dictionary
     """
     if trans_dict == {}:
         read_dict_from_file("global_dicts/{0}.txt".format(key), trans_dict)
     out = ""
-    msg = strip2(strip2(message.content, parser.settings["command_str"]), key)
+    msg = strip2(strip2(message.content, settings["command_str"]), key)
     msg = convert_string(msg, convert_text)
     for ch in msg:  # dict contains uppercase letters
         out += trans_dict.get(ch, ch)
@@ -91,12 +91,12 @@ def translate(message: str, key: str, trans_dict: dict, parser, convert_text=1, 
 
 
 # not to be confused with discord nickname
-def set_name(message, user_list, trigger_string, parser, help=False):
+def set_name(message, user_list, trigger_string, settings, help=False):
     """
     Sets a user's nickname - not to be confused with the discord nickname
     """
-    if parser.settings.get("annoyed_everyone", True) and message.mention_everyone:
-        return parser.settings.get("everyone_string", "no u")
+    if settings.get("annoyed_everyone", True) and message.mention_everyone:
+        return settings.get("everyone_string", "no u")
     elif message.mention_everyone:
         for member in message.guild.members:
             user_list.append(member)
@@ -118,12 +118,12 @@ def set_name(message, user_list, trigger_string, parser, help=False):
     return out
 
 
-def get_name(message, user_list, parser, help=False):
+def get_name(message, user_list, settings, help=False):
     """
     Gets a user's nickname - not to be confused with the discord nickname
     """
-    if parser.settings.get("annoyed_everyone", True) and message.mention_everyone:
-        return parser.settings.get("everyone_string", "no u")
+    if settings.get("annoyed_everyone", True) and message.mention_everyone:
+        return settings.get("everyone_string", "no u")
     elif message.mention_everyone:
         for member in message.guild.members:
             user_list.append(member)

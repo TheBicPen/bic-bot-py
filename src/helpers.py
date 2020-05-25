@@ -88,12 +88,11 @@ def write_dict_to_file(d: dict, fl: str):
     Writes the key-value pairs in d as space-separated words
     in file. Each pair is on its own line.
     """
-    file_obj = open(fl, "w+")
-    for key, value in d.items():
-        key = key.replace(";", "\\;")
-        value = value.replace(";", "\\;")
-        file_obj.write("{0};{1}\n".format(key, value))
-    file_obj.close()
+    with open(fl, "w+") as file_obj:
+        for key, value in d.items():
+            key = str(key).replace(";", "\\;")
+            value = str(value).replace(";", "\\;")
+            file_obj.write("{0};{1}\n".format(key, value))
 
 # def get_trans(fl:str, d:dict):
 #     if d != {}:
