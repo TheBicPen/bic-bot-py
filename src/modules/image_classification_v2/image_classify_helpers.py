@@ -37,14 +37,6 @@ async def classify_attachment(message, tf_sess, classifications):
     # check image using image-classification
     attachment = message.attachments[0]
     print("message contains attachment at:{0}".format(attachment.url))
-    #img = urllib.request.urlretrieve(url)
-    # async with aiohttp.get(url) as response:
-    #     print(response)
-    #     if response.status != 200:
-    #         return "unable to retrieve image"
-    #     img = await response.read()
-    #     print(type(img))
-    #     result = ic.classify_image(img, tf_sess, classifications)
     img = await attachment.read()
     result = ic.classify_image(img, tf_sess, classifications)
     return (result, attachment)
